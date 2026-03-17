@@ -15,7 +15,7 @@ services:
       - auth-db-data:/var/lib/postgresql/data
 
   auth-service:
-    build: .
+    image: thaua1/rota-facil-auth-service:latest
 
     environment:
       DATASOURCE_URL: ${DATASOURCE_URL}
