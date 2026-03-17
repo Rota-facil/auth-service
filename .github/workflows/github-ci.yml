@@ -32,7 +32,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: build-docker-image
-        run: docker build -t thaua1/rota-facil-auth-service:latest
+        run: docker build -t thaua1/rota-facil-auth-service:latest .
 
       - name: push-docker-image-to-docker-hub
         run: docker push thaua1/rota-facil-auth-service:latest
