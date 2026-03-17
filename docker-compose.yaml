@@ -14,14 +14,5 @@ services:
     volumes:
       - auth-db-data:/var/lib/postgresql/data
 
-  auth-service:
-    image: thaua1/rota-facil-auth-service:latest
-    container_name: auth-service
-
-    environment:
-      DATASOURCE_URL: ${DATASOURCE_URL}
-      DATASOURCE_USERNAME: ${DATASOURCE_USERNAME}
-      DATASOURCE_PASSWORD: ${DATASOURCE_PASSWORD}
-
 volumes:
   auth-db-data:
