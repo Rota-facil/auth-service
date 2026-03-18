@@ -6,6 +6,7 @@ on:
       - "src/**"
       - "Dockerfile"
       - "pom.xml"
+      - ".github/**"
 
 jobs:
   build:
