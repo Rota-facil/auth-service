@@ -97,6 +97,9 @@ public class UserService {
 
         if (isDifferentEmail) rabbitGatewayEventProducer.updateUserEvent(userEventMapper.mapGatewayUserUpdatedSend(updated, currentUser.token()));
 
+        rabbitAuditEventProducer.updateUserEvent(userEventMapper.mapAuditSend(updated, ActionType.UPDATE, updated.getId()));
+        rabbitTransportEventProducer.updateUserEvent(userEventMapper.mapTransportUserUpdatedSend(updated));
+        
         return userMapper.map(updated);
     }
 
