@@ -3,9 +3,13 @@ package com.rota.facil.auth_service.business;
 import com.rota.facil.auth_service.domain.enums.ActionType;
 import com.rota.facil.auth_service.domain.enums.Role;
 import com.rota.facil.auth_service.domain.exceptions.PrefectureNotFoundException;
+import com.rota.facil.auth_service.domain.exceptions.UserNotFoundException;
 import com.rota.facil.auth_service.http.dto.request.CreateAccountRequestDTO;
+import com.rota.facil.auth_service.http.dto.request.CurrentUser;
 import com.rota.facil.auth_service.http.dto.request.LoginRequestDTO;
+import com.rota.facil.auth_service.http.dto.request.UpdateAccountRequestDTO;
 import com.rota.facil.auth_service.http.dto.response.AccessTokenResponseDTO;
+import com.rota.facil.auth_service.http.dto.response.UserResponseDTO;
 import com.rota.facil.auth_service.messaging.mappers.UserEventMapper;
 import com.rota.facil.auth_service.messaging.producers.RabbitAuditEventProducer;
 import com.rota.facil.auth_service.messaging.producers.RabbitFileEventProducer;
@@ -16,12 +20,16 @@ import com.rota.facil.auth_service.persistence.entities.UserEntity;
 import com.rota.facil.auth_service.persistence.mappers.UserMapper;
 import com.rota.facil.auth_service.persistence.repositories.PrefectureRepository;
 import com.rota.facil.auth_service.persistence.repositories.UserRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -65,5 +73,38 @@ public class UserService {
 
         String token = tokenService.generateAccessToken(userEntity);
         return new AccessTokenResponseDTO(token);
+    }
+
+    @Transactional
+    public UserResponseDTO update(UpdateAccountRequestDTO request, CurrentUser currentUser) {
+        UserEntity userFound = this.fetchEntity(currentUser.userId());
+
+        boolean isDifferentEmail = userFound.isDifferentEmail(request.email());
+
+        if (request.prefectureId() != null && !userFound.getPrefecture().getId().equals(request.prefectureId())) {
+            PrefectureEntity prefectureFound = prefectureRepository.findById(request.prefectureId())
+                    .orElseThrow(PrefectureNotFoundException::new);
+
+            userFound.setPrefecture(null);
+            userFound.setPrefecture(prefectureFound);
+        }
+
+        UserEntity infoToUpdate = userMapper.map(request);
+
+        userFound.update(infoToUpdate);
+
+        UserEntity updated = userRepository.save(userFound);
+
+        if (isDifferentEmail) rabbitGatewayEventProducer.updateUserEvent(userEventMapper.mapGatewayUserUpdatedSend(updated, currentUser.token()));
+
+        return userMapper.map(updated);
+    }
+
+    public UserResponseDTO fetch(CurrentUser currentUser) {
+        return userMapper.map(this.fetchEntity(currentUser.userId()));
+    }
+
+    private UserEntity fetchEntity(UUID userId) {
+        return userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
     }
 }

@@ -82,4 +82,15 @@ public class UserEntity implements UserDetails {
     public boolean isEnabled() {
         return UserDetails.super.isEnabled();
     }
+
+    public void update(UserEntity infoToUpdate) {
+        if (infoToUpdate.getName() != null && !infoToUpdate.getName().equals(this.name)) this.name = infoToUpdate.getName();
+        if (infoToUpdate.getEmail() != null && !infoToUpdate.getEmail().equals(this.email)) this.email = infoToUpdate.getEmail();
+        if (infoToUpdate.getCpf() != null && !infoToUpdate.getCpf().equals(this.cpf)) this.cpf = infoToUpdate.getCpf();
+
+    }
+
+    public boolean isDifferentEmail(String email) {
+        return email != null && !this.email.equals(email);
+    }
 }

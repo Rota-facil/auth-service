@@ -1,13 +1,10 @@
 package com.rota.facil.auth_service.security.filters;
 
-import com.rota.facil.auth_service.http.dto.request.AuthGatewayRequest;
-import com.rota.facil.auth_service.persistence.entities.UserEntity;
-import com.rota.facil.auth_service.security.user.details.service.MyUserDetailsService;
+import com.rota.facil.auth_service.http.dto.request.CurrentUser;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,6 +23,7 @@ public class SecurityFilter extends OncePerRequestFilter {
         String email = request.getHeader("x-user-email");
         String role = request.getHeader("x-user-role");
         String prefectureId = request.getHeader("x-prefecture-id");
+        String userToken = request.getHeader("x-user-token");
 
         if(id == null || email == null || role == null || prefectureId == null) {
             filterChain.doFilter(request, response);
@@ -33,8 +31,8 @@ public class SecurityFilter extends OncePerRequestFilter {
         }
 
         role = "ROLE_" + role;
-        AuthGatewayRequest authGatewayRequest = new AuthGatewayRequest(UUID.fromString(id), UUID.fromString(prefectureId), email, role);
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(authGatewayRequest, null, List.of(new SimpleGrantedAuthority(authGatewayRequest.role())));
+        CurrentUser currentUser = new CurrentUser(UUID.fromString(id), UUID.fromString(prefectureId), email, role, userToken);
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(currentUser, null, List.of(new SimpleGrantedAuthority(currentUser.role())));
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         filterChain.doFilter(request, response);
     }
