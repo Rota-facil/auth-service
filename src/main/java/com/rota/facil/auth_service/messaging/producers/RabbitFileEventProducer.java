@@ -15,10 +15,10 @@ public class RabbitFileEventProducer {
     @Value("${rabbitmq.auth.exchange}")
     private String authExchange;
 
-    @Value("${rabbitmq.file.user.deleted.routing.key}")
+    @Value("${rabbitmq.user.deleted.routing.key}")
     private String userDeletedRoutingKey;
 
-    @Value("${rabbitmq.file.prefecture.deleted.routing.key}")
+    @Value("${rabbitmq.prefecture.deleted.routing.key}")
     private String prefectureDeletedRoutingKey;
 
     public void deleteUserEvent(FileUserDeletedEventSend fileUserDeletedEventSend) {

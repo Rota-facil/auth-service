@@ -14,22 +14,22 @@ public class RabbitAuditEventProducer {
     @Value("${rabbitmq.auth.exchange}")
     private String authExchange;
 
-    @Value("${rabbitmq.file.user.created.routing.key}")
+    @Value("${rabbitmq.user.created.routing.key}")
     private String userCreatedRoutingKey;
 
-    @Value("${rabbitmq.file.user.updated.routing.key}")
+    @Value("${rabbitmq.user.updated.routing.key}")
     private String userUpdatedRoutingKey;
 
-    @Value("${rabbitmq.file.user.deleted.routing.key}")
+    @Value("${rabbitmq.user.deleted.routing.key}")
     private String userDeletedRoutingKey;
 
-    @Value("${rabbitmq.file.prefecture.created.routing.key}")
+    @Value("${rabbitmq.prefecture.created.routing.key}")
     private String prefectureCreatedRoutingKey;
 
-    @Value("${rabbitmq.file.prefecture.updated.routing.key}")
+    @Value("${rabbitmq.prefecture.updated.routing.key}")
     private String prefectureUpdatedRoutingKey;
 
-    @Value("${rabbitmq.file.prefecture.deleted.routing.key}")
+    @Value("${rabbitmq.prefecture.deleted.routing.key}")
     private String prefectureDeletedRoutingKey;
 
     public void createUserEvent(AuditUserEventSend auditUserEventSend) {

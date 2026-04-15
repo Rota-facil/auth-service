@@ -16,13 +16,13 @@ public class RabbitTransportEventProducer {
     @Value("${rabbitmq.auth.exchange}")
     private String authExchange;
 
-    @Value("${rabbitmq.file.user.created.routing.key}")
+    @Value("${rabbitmq.user.created.routing.key}")
     private String userCreatedRoutingKey;
 
-    @Value("${rabbitmq.file.user.updated.routing.key}")
+    @Value("${rabbitmq.user.updated.routing.key}")
     private String userUpdatedRoutingKey;
 
-    @Value("${rabbitmq.file.user.deleted.routing.key}")
+    @Value("${rabbitmq.user.deleted.routing.key}")
     private String userDeletedRoutingKey;
 
 

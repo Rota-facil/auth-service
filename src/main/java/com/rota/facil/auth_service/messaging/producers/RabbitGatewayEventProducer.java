@@ -14,7 +14,7 @@ public class RabbitGatewayEventProducer {
     @Value("${rabbitmq.auth.exchange}")
     private String authExchange;
 
-    @Value("${rabbitmq.file.user.deleted.routing.key}")
+    @Value("${rabbitmq.user.deleted.routing.key}")
     private String userDeletedRoutingKey;
 
     public void deleteUserEvent(GatewayUserDeletedEventSend gatewayUserEventSend) {
