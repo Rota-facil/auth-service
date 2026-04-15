@@ -2,10 +2,7 @@ package com.rota.facil.auth_service.messaging.mappers;
 
 import com.rota.facil.auth_service.domain.enums.ActionType;
 import com.rota.facil.auth_service.domain.enums.ResourceName;
-import com.rota.facil.auth_service.messaging.dto.send.AuditUserEventSend;
-import com.rota.facil.auth_service.messaging.dto.send.GatewayUserUpdatedEventSend;
-import com.rota.facil.auth_service.messaging.dto.send.TransportUserCreatedEventSend;
-import com.rota.facil.auth_service.messaging.dto.send.TransportUserDeletedEventSend;
+import com.rota.facil.auth_service.messaging.dto.send.*;
 import com.rota.facil.auth_service.persistence.entities.UserEntity;
 import org.mapstruct.Builder;
 import org.mapstruct.Mapper;
@@ -31,7 +28,7 @@ public interface UserEventMapper {
     TransportUserCreatedEventSend mapTransportUserCreatedSend(UserEntity entity);
 
     @Mapping(target = "userId", source = "id")
-    TransportUserCreatedEventSend mapTransportUserUpdatedSend(UserEntity entity);
+    TransportUserUpdatedEventSend mapTransportUserUpdatedSend(UserEntity entity);
 
     @Mapping(target = "userId", source = "id")
     TransportUserDeletedEventSend mapTransportUserDeletedSend(UserEntity entity);
