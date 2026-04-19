@@ -1,6 +1,5 @@
 package com.rota.facil.auth_service.business;
 
-import com.rota.facil.auth_service.domain.enums.ActionType;
 import com.rota.facil.auth_service.domain.enums.Role;
 import com.rota.facil.auth_service.domain.exceptions.PrefectureNotFoundException;
 import com.rota.facil.auth_service.domain.exceptions.UserNotFoundException;
@@ -10,17 +9,12 @@ import com.rota.facil.auth_service.http.dto.request.LoginRequestDTO;
 import com.rota.facil.auth_service.http.dto.request.UpdateAccountRequestDTO;
 import com.rota.facil.auth_service.http.dto.response.AccessTokenResponseDTO;
 import com.rota.facil.auth_service.http.dto.response.UserResponseDTO;
-import com.rota.facil.auth_service.messaging.mappers.UserEventMapper;
-import com.rota.facil.auth_service.messaging.producers.RabbitAuditEventProducer;
-import com.rota.facil.auth_service.messaging.producers.RabbitFileEventProducer;
-import com.rota.facil.auth_service.messaging.producers.RabbitGatewayEventProducer;
-import com.rota.facil.auth_service.messaging.producers.RabbitTransportEventProducer;
+import com.rota.facil.auth_service.messaging.producers.*;
 import com.rota.facil.auth_service.persistence.entities.PrefectureEntity;
 import com.rota.facil.auth_service.persistence.entities.UserEntity;
 import com.rota.facil.auth_service.persistence.mappers.UserMapper;
 import com.rota.facil.auth_service.persistence.repositories.PrefectureRepository;
 import com.rota.facil.auth_service.persistence.repositories.UserRepository;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -39,12 +33,8 @@ public class UserService {
     private final PrefectureRepository prefectureRepository;
     private final TokenService tokenService;
     private final AuthenticationManager authenticationManager;
-    private final RabbitAuditEventProducer rabbitAuditEventProducer;
-    private final RabbitFileEventProducer rabbitFileEventProducer;
-    private final RabbitGatewayEventProducer rabbitGatewayEventProducer;
-    private final RabbitTransportEventProducer rabbitTransportEventProducer;
+    private final RabbitAuthUserEventProducer userEventProducer;
     private final UserMapper userMapper;
-    private final UserEventMapper userEventMapper;
 
     public AccessTokenResponseDTO register(CreateAccountRequestDTO request) {
         PrefectureEntity prefectureFound = prefectureRepository.findById(request.prefectureId())
@@ -60,8 +50,7 @@ public class UserService {
 
         String token = tokenService.generateAccessToken(saved);
 
-        rabbitAuditEventProducer.createUserEvent(userEventMapper.mapAuditSend(saved, ActionType.CREATE, saved.getId()));
-        rabbitTransportEventProducer.createUserEvent(userEventMapper.mapTransportUserCreatedSend(saved));
+        userEventProducer.createUserEvent(saved);
         return new AccessTokenResponseDTO(token);
     }
 
@@ -95,10 +84,9 @@ public class UserService {
 
         UserEntity updated = userRepository.save(userFound);
 
-        if (isDifferentEmail) rabbitGatewayEventProducer.updateUserEvent(userEventMapper.mapGatewayUserUpdatedSend(updated, currentUser.token()));
+        if (isDifferentEmail) userEventProducer.emailChangedUserEvent(updated, currentUser.token());
 
-        rabbitAuditEventProducer.updateUserEvent(userEventMapper.mapAuditSend(updated, ActionType.UPDATE, updated.getId()));
-        rabbitTransportEventProducer.updateUserEvent(userEventMapper.mapTransportUserUpdatedSend(updated));
+        userEventProducer.updateUserEvent(updated);
         
         return userMapper.map(updated);
     }

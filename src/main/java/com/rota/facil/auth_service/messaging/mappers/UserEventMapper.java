@@ -12,28 +12,15 @@ import java.util.UUID;
 
 @Mapper(componentModel = "spring", builder = @Builder(disableBuilder = true))
 public interface UserEventMapper {
-    default AuditUserEventSend mapAuditSend(UserEntity entity, ActionType actionType, UUID resourceId) {
-        return new AuditUserEventSend(
-                entity.getId(),
-                entity.getRole(),
-                entity.getEmail() + actionType.getTitle(),
-                actionType,
-                ResourceName.USERS,
-                resourceId
-        );
-    }
-
-    @Mapping(target = "userId", source = "id")
-    @Mapping(target = "prefectureId", source = "prefecture.id")
-    TransportUserCreatedEventSend mapTransportUserCreatedSend(UserEntity entity);
-
-    @Mapping(target = "userId", source = "id")
-    TransportUserUpdatedEventSend mapTransportUserUpdatedSend(UserEntity entity);
-
-    @Mapping(target = "userId", source = "id")
-    TransportUserDeletedEventSend mapTransportUserDeletedSend(UserEntity entity);
 
     @Mapping(target = "userId", source = "entity.id")
-    @Mapping(target = "userToken", source = "token")
-    GatewayUserUpdatedEventSend mapGatewayUserUpdatedSend(UserEntity entity, String token);
+    @Mapping(target = "prefectureId", source = "entity.prefecture.id")
+    @Mapping(target = "actionTitle", expression = "java(entity.getEmail() + actionType.getTitle())")
+    UserEventSend map(UserEntity entity, ActionType actionType, ResourceName resourceName, UUID resourceId);
+
+    @Mapping(target = "userId", source = "entity.id")
+    @Mapping(target = "prefectureId", source = "entity.prefecture.id")
+    @Mapping(target = "actionTitle", expression = "java(entity.getEmail() + actionType.getTitle())")
+    @Mapping(target = "userToken", source ="token")
+    UserEventSend map(UserEntity entity, String token, ActionType actionType, ResourceName resourceName, UUID resourceId);
 }
