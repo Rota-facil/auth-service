@@ -33,22 +33,22 @@ public class RabbitAuthUserEventProducer {
     private final UserEventMapper userEventMapper;
 
     public void createUserEvent(UserEntity userCreated) {
-        UserEventSend userEventSend = userEventMapper.map(userCreated, ActionType.CREATE, ResourceName.USERS, userCreated.getId());
+        UserEventSend userEventSend = userEventMapper.map(userCreated, ActionType.CREATE, userCreated.getId());
         rabbitTemplate.convertAndSend(authExchange, userCreatedRoutingKey, userEventSend);
     }
 
     public void updateUserEvent(UserEntity userUpdated) {
-        UserEventSend userEventSend = userEventMapper.map(userUpdated, ActionType.UPDATE, ResourceName.USERS, userUpdated.getId());
+        UserEventSend userEventSend = userEventMapper.map(userUpdated, ActionType.UPDATE, userUpdated.getId());
         rabbitTemplate.convertAndSend(authExchange, userUpdatedRoutingKey, userEventSend);
     }
 
     public void emailChangedUserEvent(UserEntity userEmailChanged, String token) {
-        UserEventSend userEventSend = userEventMapper.map(userEmailChanged, token, ActionType.UPDATE, ResourceName.USERS, userEmailChanged.getId());
+        UserEventSend userEventSend = userEventMapper.map(userEmailChanged, token, ActionType.UPDATE, userEmailChanged.getId());
         rabbitTemplate.convertAndSend(authExchange, userEmailChangedRoutingKey, userEventSend);
     }
 
     public void deleteUserEvent(UserEntity userDeleted, String token) {
-        UserEventSend userEventSend = userEventMapper.map(userDeleted, token, ActionType.DELETE, ResourceName.USERS, userDeleted.getId());
+        UserEventSend userEventSend = userEventMapper.map(userDeleted, token, ActionType.DELETE, userDeleted.getId());
         rabbitTemplate.convertAndSend(authExchange, userDeletedRoutingKey, userEventSend);
     }
 }
