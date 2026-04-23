@@ -1,4 +1,4 @@
-package com.rota.facil.auth_service.http.dto.request;
+package com.rota.facil.auth_service.http.dto.request.user;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
