@@ -3,10 +3,7 @@ package com.rota.facil.auth_service.business;
 import com.rota.facil.auth_service.domain.enums.Role;
 import com.rota.facil.auth_service.domain.exceptions.PrefectureNotFoundException;
 import com.rota.facil.auth_service.domain.exceptions.UserNotFoundException;
-import com.rota.facil.auth_service.http.dto.request.CreateAccountRequestDTO;
-import com.rota.facil.auth_service.http.dto.request.CurrentUser;
-import com.rota.facil.auth_service.http.dto.request.LoginRequestDTO;
-import com.rota.facil.auth_service.http.dto.request.UpdateAccountRequestDTO;
+import com.rota.facil.auth_service.http.dto.request.user.*;
 import com.rota.facil.auth_service.http.dto.response.AccessTokenResponseDTO;
 import com.rota.facil.auth_service.http.dto.response.UserResponseDTO;
 import com.rota.facil.auth_service.messaging.producers.*;
@@ -40,11 +37,29 @@ public class UserService {
         PrefectureEntity prefectureFound = prefectureRepository.findById(request.prefectureId())
                 .orElseThrow(PrefectureNotFoundException::new);
 
-        UserEntity preSaved = userMapper.map(request);
+        UserEntity preSaved  = userMapper.map(request);
 
         preSaved.setPrefecture(prefectureFound);
         preSaved.setPassword(passwordEncoder.encode(preSaved.getPassword()));
         preSaved.setRole(Role.STUDENT);
+
+        UserEntity saved = userRepository.save(preSaved);
+
+        String token = tokenService.generateAccessToken(saved);
+
+        userEventProducer.createUserEvent(saved);
+        return new AccessTokenResponseDTO(token);
+    }
+
+    public AccessTokenResponseDTO registerDriver(CreateDriverAccountRequestDTO request, CurrentUser admin) {
+        PrefectureEntity prefectureFound = prefectureRepository.findById(admin.prefectureId())
+                .orElseThrow(PrefectureNotFoundException::new);
+
+        UserEntity preSaved = userMapper.map(request);
+
+        preSaved.setPrefecture(prefectureFound);
+        preSaved.setPassword(passwordEncoder.encode(preSaved.getPassword()));
+        preSaved.setRole(Role.DRIVER);
 
         UserEntity saved = userRepository.save(preSaved);
 
@@ -87,7 +102,7 @@ public class UserService {
         if (isDifferentEmail) userEventProducer.emailChangedUserEvent(updated, currentUser.token());
 
         userEventProducer.updateUserEvent(updated);
-        
+
         return userMapper.map(updated);
     }
 

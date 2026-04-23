@@ -1,10 +1,7 @@
 package com.rota.facil.auth_service.http.controllers;
 
 import com.rota.facil.auth_service.business.UserService;
-import com.rota.facil.auth_service.http.dto.request.CreateAccountRequestDTO;
-import com.rota.facil.auth_service.http.dto.request.CurrentUser;
-import com.rota.facil.auth_service.http.dto.request.LoginRequestDTO;
-import com.rota.facil.auth_service.http.dto.request.UpdateAccountRequestDTO;
+import com.rota.facil.auth_service.http.dto.request.user.*;
 import com.rota.facil.auth_service.http.dto.response.AccessTokenResponseDTO;
 import com.rota.facil.auth_service.http.dto.response.UserResponseDTO;
 import jakarta.validation.Valid;
@@ -17,6 +14,14 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+
+    @PostMapping("/driver/register")
+    public ResponseEntity<AccessTokenResponseDTO> createDriverAccount(
+            @Valid @RequestBody CreateDriverAccountRequestDTO request,
+            @AuthenticationPrincipal CurrentUser admin
+    ) {
+        return ResponseEntity.ok(userService.registerDriver(request, admin));
+    }
 
     @PostMapping("/register")
     public ResponseEntity<AccessTokenResponseDTO> createAccount(@Valid  @RequestBody CreateAccountRequestDTO request) {
