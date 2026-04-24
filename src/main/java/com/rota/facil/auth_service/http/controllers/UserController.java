@@ -49,7 +49,7 @@ public class UserController {
         return ResponseEntity.ok(userService.register(request));
     }
 
-    @GetMapping("/login")
+    @GetMapping("/user/login")
     public ResponseEntity<AccessTokenResponseDTO> login (@Valid @RequestBody LoginRequestDTO request) {
         return ResponseEntity.ok(userService.login(request));
     }
