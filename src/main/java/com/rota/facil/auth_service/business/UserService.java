@@ -1,16 +1,21 @@
 package com.rota.facil.auth_service.business;
 
 import com.rota.facil.auth_service.domain.enums.Role;
+import com.rota.facil.auth_service.domain.exceptions.CompleteGoogleLoginException;
+import com.rota.facil.auth_service.domain.exceptions.PendingTokenExpiredException;
 import com.rota.facil.auth_service.domain.exceptions.PrefectureNotFoundException;
 import com.rota.facil.auth_service.domain.exceptions.UserNotFoundException;
+import com.rota.facil.auth_service.http.dto.request.prefecture.PrefectureUser;
 import com.rota.facil.auth_service.http.dto.request.user.*;
 import com.rota.facil.auth_service.http.dto.response.AccessTokenResponseDTO;
 import com.rota.facil.auth_service.http.dto.response.UserResponseDTO;
 import com.rota.facil.auth_service.messaging.producers.*;
 import com.rota.facil.auth_service.persistence.entities.PrefectureEntity;
+import com.rota.facil.auth_service.persistence.entities.TokenCompleteGoogleLoginEntity;
 import com.rota.facil.auth_service.persistence.entities.UserEntity;
 import com.rota.facil.auth_service.persistence.mappers.UserMapper;
 import com.rota.facil.auth_service.persistence.repositories.PrefectureRepository;
+import com.rota.facil.auth_service.persistence.repositories.TokenCompleteGoogleLoginRepository;
 import com.rota.facil.auth_service.persistence.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,6 +25,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -31,6 +38,7 @@ public class UserService {
     private final TokenService tokenService;
     private final AuthenticationManager authenticationManager;
     private final RabbitAuthUserEventProducer userEventProducer;
+    private final TokenCompleteGoogleLoginRepository tokenCompleteGoogleLoginRepository;
     private final UserMapper userMapper;
 
     public AccessTokenResponseDTO register(CreateAccountRequestDTO request) {
@@ -125,6 +133,34 @@ public class UserService {
 
     public UserResponseDTO fetch(CurrentUser currentUser) {
         return userMapper.map(this.fetchEntity(currentUser.userId()));
+    }
+
+    public AccessTokenResponseDTO completeGoogleRegistration(CompleteGoogleRegistrationRequestDTO request, UUID pendingToken) {
+        TokenCompleteGoogleLoginEntity googleLoginEntity = tokenCompleteGoogleLoginRepository.findByToken(pendingToken)
+                .orElseThrow(CompleteGoogleLoginException::new);
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime tokenCreation = googleLoginEntity.getCreatedAt();
+
+        if (now.isAfter(tokenCreation.plusMinutes(15))) {
+            tokenCompleteGoogleLoginRepository.deleteByToken(pendingToken);
+            throw new PendingTokenExpiredException();
+        }
+
+        UserEntity user = googleLoginEntity.getUser();
+
+        PrefectureEntity prefectureFound = prefectureRepository.findById(request.prefectureId())
+                        .orElseThrow(PrefectureNotFoundException::new);
+
+
+        user.setCpf(request.cpf());
+        user.setPrefecture(prefectureFound);
+
+        UserEntity saved = userRepository.save(user);
+
+        tokenCompleteGoogleLoginRepository.deleteByToken(pendingToken);
+
+        return new AccessTokenResponseDTO(tokenService.generateAccessToken(saved));
     }
 
     private UserEntity fetchEntity(UUID userId) {
