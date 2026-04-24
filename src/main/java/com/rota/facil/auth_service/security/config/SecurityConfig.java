@@ -33,17 +33,13 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .oauth2Login(oauth2Login -> oauth2Login.successHandler(authSuccessHandler))
                 .csrf(CsrfConfigurer::disable)
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .formLogin(FormLoginConfigurer::disable)
                 .httpBasic(HttpBasicConfigurer::disable)
+                .oauth2Login(oauth2Login -> oauth2Login.successHandler(authSuccessHandler))
                 .headers(header -> header.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-//                .authorizeHttpRequests(auth -> auth
-//                        .requestMatchers("/login/**", "/oauth2/**", "/auth/google/**", "/error").permitAll()
-//                        .anyRequest().authenticated()
-//                )
                 .build();
     }
 

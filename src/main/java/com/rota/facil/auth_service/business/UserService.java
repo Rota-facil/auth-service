@@ -160,6 +160,7 @@ public class UserService {
 
         tokenCompleteGoogleLoginRepository.deleteByToken(pendingToken);
 
+        userEventProducer.createUserEvent(user);
         return new AccessTokenResponseDTO(tokenService.generateAccessToken(saved));
     }
 
