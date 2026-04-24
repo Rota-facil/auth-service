@@ -55,12 +55,18 @@ public class AuthSuccessHandler implements AuthenticationSuccessHandler {
             response.getWriter().write("{\"accessToken\": \"" + accessToken + "\"}");
         } else {
             UUID pendingToken = UUID.randomUUID();
-            tokenCompleteGoogleLoginRepository.save(
-                    TokenCompleteGoogleLoginEntity.builder()
-                            .user(user)
-                            .pendingToken(pendingToken)
-                            .build()
-            );
+
+            tokenCompleteGoogleLoginRepository.findByUserId(user.getId())
+                    .map(token -> {
+                        token.setPendingToken(pendingToken);
+                        return tokenCompleteGoogleLoginRepository.save(token);
+                    })
+                            .orElseGet(() -> tokenCompleteGoogleLoginRepository.save(
+                                    TokenCompleteGoogleLoginEntity.builder()
+                                            .user(user)
+                                            .pendingToken(pendingToken)
+                                            .build()
+                            ));
 
             response.setContentType("application/json");
             response.getWriter().write("{\"completeLoginToken\": \"" + pendingToken.toString() + "\"}");

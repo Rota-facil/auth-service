@@ -3,6 +3,7 @@ package com.rota.facil.auth_service.persistence.entities;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -23,6 +24,10 @@ public class TokenCompleteGoogleLoginEntity {
     private UserEntity user;
 
     private UUID pendingToken;
+
+    @Builder.Default
+    @UpdateTimestamp
+    private LocalDateTime expiration = LocalDateTime.now();
 
     @Builder.Default
     @CreationTimestamp
