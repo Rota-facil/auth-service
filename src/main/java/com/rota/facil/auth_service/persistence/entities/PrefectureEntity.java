@@ -22,4 +22,9 @@ public class PrefectureEntity {
 
     @Enumerated(EnumType.STRING)
     private Region region;
+
+    public void update(PrefectureEntity infoToUpdate) {
+        if (infoToUpdate.getName() != null) this.name = infoToUpdate.getName();
+        if (infoToUpdate.getRegion() != null) this.region = infoToUpdate.getRegion();
+    }
 }
