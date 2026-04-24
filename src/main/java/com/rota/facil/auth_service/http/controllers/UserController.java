@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequiredArgsConstructor
 public class UserController {
@@ -17,10 +19,19 @@ public class UserController {
 
     @PostMapping("/driver/register")
     public ResponseEntity<AccessTokenResponseDTO> createDriverAccount(
-            @Valid @RequestBody CreateDriverAccountRequestDTO request,
+            @Valid @RequestBody CreateUserAccountRequestDTO request,
             @AuthenticationPrincipal CurrentUser admin
     ) {
         return ResponseEntity.ok(userService.registerDriver(request, admin));
+    }
+
+    @PostMapping("/user/prefecture/register")
+    public ResponseEntity<AccessTokenResponseDTO> createPrefectureAccount(
+            @Valid @RequestBody CreateUserAccountRequestDTO request,
+            @AuthenticationPrincipal CurrentUser admin,
+            @RequestParam UUID prefectureId
+            ) {
+        return ResponseEntity.ok(userService.registerUserPrefecture(request, prefectureId, admin));
     }
 
     @PostMapping("/register")

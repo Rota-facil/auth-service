@@ -51,7 +51,7 @@ public class UserService {
         return new AccessTokenResponseDTO(token);
     }
 
-    public AccessTokenResponseDTO registerDriver(CreateDriverAccountRequestDTO request, CurrentUser admin) {
+    public AccessTokenResponseDTO registerDriver(CreateUserAccountRequestDTO request, CurrentUser admin) {
         PrefectureEntity prefectureFound = prefectureRepository.findById(admin.prefectureId())
                 .orElseThrow(PrefectureNotFoundException::new);
 
@@ -67,6 +67,10 @@ public class UserService {
 
         userEventProducer.createUserEvent(saved);
         return new AccessTokenResponseDTO(token);
+    }
+
+    public AccessTokenResponseDTO registerUserPrefecture(CreateUserAccountRequestDTO request, UUID prefectureId, CurrentUser admin) {
+        return null;
     }
 
     public AccessTokenResponseDTO login(LoginRequestDTO request) {
