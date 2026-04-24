@@ -28,10 +28,9 @@ public class UserController {
     @PostMapping("/user/prefecture/register")
     public ResponseEntity<AccessTokenResponseDTO> createPrefectureAccount(
             @Valid @RequestBody CreateUserAccountRequestDTO request,
-            @AuthenticationPrincipal CurrentUser admin,
-            @RequestParam UUID prefectureId
+            @AuthenticationPrincipal CurrentUser admin
             ) {
-        return ResponseEntity.ok(userService.registerUserPrefecture(request, prefectureId, admin));
+        return ResponseEntity.ok(userService.registerUserPrefecture(request, admin));
     }
 
     @PostMapping("/register")

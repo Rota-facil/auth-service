@@ -69,8 +69,21 @@ public class UserService {
         return new AccessTokenResponseDTO(token);
     }
 
-    public AccessTokenResponseDTO registerUserPrefecture(CreateUserAccountRequestDTO request, UUID prefectureId, CurrentUser admin) {
-        return null;
+    public AccessTokenResponseDTO registerUserPrefecture(CreateUserAccountRequestDTO request, CurrentUser admin) {
+        PrefectureEntity prefectureFound = prefectureRepository.findById(admin.prefectureId())
+                .orElseThrow(PrefectureNotFoundException::new);
+
+        UserEntity preSaved = userMapper.map(request);
+
+        preSaved.setPrefecture(prefectureFound);
+        preSaved.setPassword(passwordEncoder.encode(preSaved.getPassword()));
+        preSaved.setRole(Role.ADMIN);
+
+        UserEntity saved = userRepository.save(preSaved);
+
+        String token = tokenService.generateAccessToken(saved);
+
+        return new AccessTokenResponseDTO(token);
     }
 
     public AccessTokenResponseDTO login(LoginRequestDTO request) {

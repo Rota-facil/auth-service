@@ -6,9 +6,10 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum ActionType {
-    CREATE(" criou uma conta"),
-    UPDATE(" atualizou seus dados"),
-    DELETE( "deletou sua conta");
+    CREATE(" criou uma conta", " criou prefeitura "),
+    UPDATE(" atualizou seus dados", " atualizou dados da prefeitura "),
+    DELETE( "deletou sua conta", " deletou prefeitura ");
 
-    private final String title;
+    private final String userTitle;
+    private final String prefectureTitle;
 }

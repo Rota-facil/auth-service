@@ -1,5 +1,6 @@
 package com.rota.facil.auth_service.persistence.mappers;
 
+import com.rota.facil.auth_service.http.dto.request.prefecture.PrefectureUser;
 import com.rota.facil.auth_service.http.dto.request.user.CreateAccountRequestDTO;
 import com.rota.facil.auth_service.http.dto.request.user.CreateUserAccountRequestDTO;
 import com.rota.facil.auth_service.http.dto.request.user.UpdateAccountRequestDTO;
@@ -14,4 +15,5 @@ public interface UserMapper {
     UserEntity map(CreateUserAccountRequestDTO request);
     UserEntity map(UpdateAccountRequestDTO request);
     UserResponseDTO map(UserEntity entity);
+    UserEntity map(PrefectureUser prefectureUser);
 }
