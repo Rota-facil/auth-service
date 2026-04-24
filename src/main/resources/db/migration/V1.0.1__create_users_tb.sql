@@ -1,10 +1,10 @@
 CREATE TABLE IF NOT EXISTS users_tb (
     user_id UUID PRIMARY KEY,
-    prefecture_id UUID NOT NULL,
+    prefecture_id UUID,
     name VARCHAR(120) NOT NULL,
     email VARCHAR (120) NOT NULL,
-    cpf VARCHAR(14) NOT NULL,
-    password VARCHAR(120) NOT NULL,
+    cpf VARCHAR(14),
+    password VARCHAR(120),
     google_id TEXT,
     role VARCHAR(10) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
