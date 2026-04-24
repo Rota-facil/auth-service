@@ -140,7 +140,7 @@ public class UserService {
                 .orElseThrow(CompleteGoogleLoginException::new);
 
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime tokenCreation = googleLoginEntity.getCreatedAt();
+        LocalDateTime tokenCreation = googleLoginEntity.getExpiration();
 
         if (now.isAfter(tokenCreation.plusMinutes(15))) {
             tokenCompleteGoogleLoginRepository.deleteByToken(pendingToken);

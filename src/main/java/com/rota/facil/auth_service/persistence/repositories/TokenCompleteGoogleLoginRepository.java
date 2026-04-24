@@ -24,4 +24,11 @@ public interface TokenCompleteGoogleLoginRepository extends JpaRepository<TokenC
         WHERE tcgl.pendingToken = :pendingToken
     """)
     void deleteByToken(@Param("pendingToken") UUID pendingToken);
+
+    @Query("""
+        SELECT tcgl FROM TokenCompleteGoogleLoginEntity tcgl
+        INNER JOIN tcgl.user u
+        WHERE u.id = :userId
+    """)
+    Optional<TokenCompleteGoogleLoginEntity> findByUserId(@Param("userId") UUID userId);
 }
