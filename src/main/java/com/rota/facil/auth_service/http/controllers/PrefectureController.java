@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/prefecture")
+@RequestMapping("/prefectures")
 @RequiredArgsConstructor
 public class PrefectureController {
     private final PrefectureService prefectureService;
