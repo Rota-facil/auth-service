@@ -1,5 +1,6 @@
 package com.rota.facil.auth_service.business;
 
+import com.rota.facil.auth_service.domain.enums.Role;
 import com.rota.facil.auth_service.domain.exceptions.PrefectureNotFoundException;
 import com.rota.facil.auth_service.http.dto.request.prefecture.CreatePrefectureRequestDTO;
 import com.rota.facil.auth_service.http.dto.request.prefecture.UpdatePrefectureRequestDTO;
@@ -16,6 +17,7 @@ import com.rota.facil.auth_service.persistence.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -31,6 +33,7 @@ public class PrefectureService {
     private final PrefectureMapper prefectureMapper;
     private final UserMapper userMapper;
 
+    @Transactional
     public CreatePrefectureResponseDTO register(CreatePrefectureRequestDTO request, CurrentUser currentUser) {
         PrefectureEntity prefecturePreSaved = prefectureMapper.map(request);
         UserEntity defaultAdminPrefectureUser = userMapper.map(request.prefectureUser());
@@ -39,6 +42,7 @@ public class PrefectureService {
 
         defaultAdminPrefectureUser.setPrefecture(prefectureSaved);
         defaultAdminPrefectureUser.setPassword(passwordEncoder.encode(defaultAdminPrefectureUser.getPassword()));
+        defaultAdminPrefectureUser.setRole(Role.ADMIN);
 
         UserEntity savedDefaultAdminPrefectureUser = userRepository.save(defaultAdminPrefectureUser);
 

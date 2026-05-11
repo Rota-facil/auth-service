@@ -30,9 +30,8 @@ public class SecurityFilter extends OncePerRequestFilter {
             return;
         }
 
-        role = "ROLE_" + role;
         CurrentUser currentUser = new CurrentUser(UUID.fromString(id), UUID.fromString(prefectureId), email, role, userToken);
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(currentUser, null, List.of(new SimpleGrantedAuthority(currentUser.role())));
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(currentUser, null, List.of(new SimpleGrantedAuthority("ROLE_" + currentUser.role())));
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         filterChain.doFilter(request, response);
     }
