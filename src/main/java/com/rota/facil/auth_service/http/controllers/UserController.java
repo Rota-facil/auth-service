@@ -39,9 +39,9 @@ public class UserController {
     @PostMapping("/google/complete-registration")
     public ResponseEntity<AccessTokenResponseDTO> completeGoogleRegistration(
             @RequestBody CompleteGoogleRegistrationRequestDTO request,
-            @RequestParam UUID pendingToken
+            @RequestParam String pendingToken
     ) {
-        return ResponseEntity.ok(userService.completeGoogleRegistration(request, pendingToken));
+        return ResponseEntity.ok(userService.completeGoogleRegistration(request, UUID.fromString(pendingToken)));
     }
 
     @PostMapping("/register")
