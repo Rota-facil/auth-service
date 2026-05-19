@@ -66,4 +66,10 @@ public class UserController {
     public ResponseEntity<UserResponseDTO> fetch(@AuthenticationPrincipal CurrentUser currentUser) {
         return ResponseEntity.ok(userService.fetch(currentUser));
     }
+
+    @DeleteMapping
+    public ResponseEntity<Void> deleteAccount(@AuthenticationPrincipal CurrentUser currentUser) {
+        userService.delete(currentUser);
+        return ResponseEntity.ok().build();
+    }
 }

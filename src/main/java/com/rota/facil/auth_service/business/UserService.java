@@ -131,6 +131,13 @@ public class UserService {
         return userMapper.map(updated);
     }
 
+    public void delete(CurrentUser currentUser) {
+        UserEntity userFound = this.fetchEntity(currentUser.userId());
+        userRepository.delete(userFound);
+
+        userEventProducer.deleteUserEvent(userFound, currentUser.token());
+    }
+
     public UserResponseDTO fetch(CurrentUser currentUser) {
         return userMapper.map(this.fetchEntity(currentUser.userId()));
     }
