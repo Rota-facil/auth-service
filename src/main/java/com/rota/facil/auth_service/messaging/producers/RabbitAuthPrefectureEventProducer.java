@@ -1,6 +1,7 @@
 package com.rota.facil.auth_service.messaging.producers;
 
 import com.rota.facil.auth_service.domain.enums.ActionType;
+import com.rota.facil.auth_service.domain.enums.PrefectureActionType;
 import com.rota.facil.auth_service.http.dto.request.user.CurrentUser;
 import com.rota.facil.auth_service.messaging.dto.send.PrefectureEventSend;
 import com.rota.facil.auth_service.messaging.mappers.PrefectureEventMapper;
@@ -29,17 +30,17 @@ public class RabbitAuthPrefectureEventProducer {
     private String prefectureDeletedRoutingKey;
 
     public void createPrefectureEvent(PrefectureEntity prefectureCreated, CurrentUser currentUser) {
-        PrefectureEventSend prefectureEventSend = prefectureEventMapper.map(prefectureCreated, currentUser, ActionType.CREATE);
+        PrefectureEventSend prefectureEventSend = prefectureEventMapper.map(prefectureCreated, currentUser, PrefectureActionType.CREATE);
         rabbitTemplate.convertAndSend(authExchange, prefectureCreatedRoutingKey, prefectureEventSend);
     }
 
     public void updatePrefectureEvent(PrefectureEntity prefectureUpdated, CurrentUser currentUser) {
-        PrefectureEventSend prefectureEventSend = prefectureEventMapper.map(prefectureUpdated, currentUser, ActionType.UPDATE);
+        PrefectureEventSend prefectureEventSend = prefectureEventMapper.map(prefectureUpdated, currentUser, PrefectureActionType.UPDATE);
         rabbitTemplate.convertAndSend(authExchange, prefectureUpdatedRoutingKey, prefectureEventSend);
     }
 
     public void deletePrefectureEvent(PrefectureEntity prefectureDeleted, CurrentUser currentUser) {
-        PrefectureEventSend prefectureEventSend = prefectureEventMapper.map(prefectureDeleted, currentUser, ActionType.DELETE);
+        PrefectureEventSend prefectureEventSend = prefectureEventMapper.map(prefectureDeleted, currentUser, PrefectureActionType.DELETE);
         rabbitTemplate.convertAndSend(authExchange, prefectureDeletedRoutingKey, prefectureEventSend);
     }
 

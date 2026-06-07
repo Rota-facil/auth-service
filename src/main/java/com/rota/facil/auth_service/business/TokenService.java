@@ -1,10 +1,8 @@
 package com.rota.facil.auth_service.business;
 
-import com.rota.facil.auth_service.http.dto.response.AccessTokenResponseDTO;
 import com.rota.facil.auth_service.persistence.entities.UserEntity;
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.security.PrivateKey;

@@ -2,13 +2,12 @@ package com.rota.facil.auth_service.http.controllers;
 
 import com.rota.facil.auth_service.business.UserService;
 import com.rota.facil.auth_service.http.dto.request.user.*;
-import com.rota.facil.auth_service.http.dto.response.AccessTokenResponseDTO;
-import com.rota.facil.auth_service.http.dto.response.UserResponseDTO;
+import com.rota.facil.auth_service.http.dto.response.user.AccessTokenResponseDTO;
+import com.rota.facil.auth_service.http.dto.response.user.UserResponseDTO;
 import com.rota.facil.auth_service.http.google.handler.AuthSuccessHandler;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -65,6 +64,12 @@ public class UserController {
     @GetMapping("/me")
     public ResponseEntity<UserResponseDTO> fetch(@AuthenticationPrincipal CurrentUser currentUser) {
         return ResponseEntity.ok(userService.fetch(currentUser));
+    }
+
+    @PatchMapping("/deactivate")
+    public ResponseEntity<Void> deactivateAccount(@AuthenticationPrincipal CurrentUser currentUser) {
+        userService.deactivate(currentUser);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping

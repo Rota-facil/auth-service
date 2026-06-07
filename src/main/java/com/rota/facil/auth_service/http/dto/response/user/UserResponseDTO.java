@@ -1,4 +1,4 @@
-package com.rota.facil.auth_service.http.dto.response;
+package com.rota.facil.auth_service.http.dto.response.user;
 
 import com.rota.facil.auth_service.domain.enums.Role;
 
@@ -9,6 +9,7 @@ public record UserResponseDTO(
         String name,
         String email,
         String cpf,
+        Boolean active,
         Role role
 ) {
 }

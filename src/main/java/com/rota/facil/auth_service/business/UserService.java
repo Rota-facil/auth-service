@@ -5,10 +5,9 @@ import com.rota.facil.auth_service.domain.exceptions.CompleteGoogleLoginExceptio
 import com.rota.facil.auth_service.domain.exceptions.PendingTokenExpiredException;
 import com.rota.facil.auth_service.domain.exceptions.PrefectureNotFoundException;
 import com.rota.facil.auth_service.domain.exceptions.UserNotFoundException;
-import com.rota.facil.auth_service.http.dto.request.prefecture.PrefectureUser;
 import com.rota.facil.auth_service.http.dto.request.user.*;
-import com.rota.facil.auth_service.http.dto.response.AccessTokenResponseDTO;
-import com.rota.facil.auth_service.http.dto.response.UserResponseDTO;
+import com.rota.facil.auth_service.http.dto.response.user.AccessTokenResponseDTO;
+import com.rota.facil.auth_service.http.dto.response.user.UserResponseDTO;
 import com.rota.facil.auth_service.messaging.producers.*;
 import com.rota.facil.auth_service.persistence.entities.PrefectureEntity;
 import com.rota.facil.auth_service.persistence.entities.TokenCompleteGoogleLoginEntity;
@@ -25,7 +24,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -131,13 +129,6 @@ public class UserService {
         return userMapper.map(updated);
     }
 
-    public void delete(CurrentUser currentUser) {
-        UserEntity userFound = this.fetchEntity(currentUser.userId());
-        userRepository.delete(userFound);
-
-        userEventProducer.deleteUserEvent(userFound, currentUser.token());
-    }
-
     public UserResponseDTO fetch(CurrentUser currentUser) {
         return userMapper.map(this.fetchEntity(currentUser.userId()));
     }
@@ -169,6 +160,21 @@ public class UserService {
 
         userEventProducer.createUserEvent(user);
         return new AccessTokenResponseDTO(tokenService.generateAccessToken(saved));
+    }
+
+    public void delete(CurrentUser currentUser) {
+        UserEntity userFound = this.fetchEntity(currentUser.userId());
+        userRepository.delete(userFound);
+
+        userEventProducer.deleteUserEvent(userFound, currentUser.token());
+    }
+
+    public void deactivate(CurrentUser currentUser) {
+        UserEntity userFound = this.fetchEntity(currentUser.userId());
+        userFound.setActive(false);
+        userRepository.save(userFound);
+
+        userEventProducer.deactivateUserEvent(userFound, currentUser.token());
     }
 
     private UserEntity fetchEntity(UUID userId) {
