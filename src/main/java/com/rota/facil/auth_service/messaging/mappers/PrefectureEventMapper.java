@@ -10,7 +10,7 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring", builder = @Builder(disableBuilder = true))
 public interface PrefectureEventMapper {
-    @Mapping(target = "actionTitle", expression = "java(currentUser.email() + actionType.getPrefectureTitle() + entity.getName())")
+    @Mapping(target = "actionTitle", expression = "java(currentUser.email() + actionType.getTitle() + entity.getName())")
     @Mapping(target = "resourceName", expression = "java(ResourceName.PREFECTURE)")
     @Mapping(target = "resourceId", source = "entity.id")
     PrefectureEventSend map(PrefectureEntity entity, CurrentUser currentUser, ActionType actionType);

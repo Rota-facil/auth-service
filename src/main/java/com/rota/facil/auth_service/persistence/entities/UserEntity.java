@@ -44,6 +44,9 @@ public class UserEntity implements UserDetails {
     private Role role;
 
     @Builder.Default
+    private Boolean active = true;
+
+    @Builder.Default
     @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();

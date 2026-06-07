@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS users_tb (
     password VARCHAR(120),
     google_id TEXT,
     role VARCHAR(10) NOT NULL,
+    active BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT fk_users_prefectures FOREIGN KEY (prefecture_id) REFERENCES prefectures_tb(prefecture_id),
