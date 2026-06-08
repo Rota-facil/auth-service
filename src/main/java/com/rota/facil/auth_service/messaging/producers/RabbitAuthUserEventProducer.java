@@ -58,5 +58,6 @@ public class RabbitAuthUserEventProducer {
 
     public void deactivateUserEvent(UserEntity userDeactivated, String token) {
         UserEventSend userEventSend = userEventMapper.map(userDeactivated, token, UserActionType.DEACTIVATE, userDeactivated.getId());
+        rabbitTemplate.convertAndSend(authExchange, userDeactivateRoutingKey, userEventSend);
     }
 }

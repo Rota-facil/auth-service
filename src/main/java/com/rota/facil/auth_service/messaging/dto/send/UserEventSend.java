@@ -13,6 +13,7 @@ public record UserEventSend(
         String email,
         Role role,
         String userToken,
+        Boolean active,
 
         String actionTitle,
         ActionType actionType,
