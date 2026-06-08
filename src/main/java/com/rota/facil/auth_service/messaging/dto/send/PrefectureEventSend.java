@@ -8,6 +8,7 @@ import java.util.UUID;
 
 public record PrefectureEventSend(
         UUID userId,
+        String email,
         Role role,
         String actionTitle,
         ActionType actionType,
