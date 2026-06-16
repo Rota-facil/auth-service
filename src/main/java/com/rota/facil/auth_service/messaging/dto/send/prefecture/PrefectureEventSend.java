@@ -1,4 +1,4 @@
-package com.rota.facil.auth_service.messaging.dto.send;
+package com.rota.facil.auth_service.messaging.dto.send.prefecture;
 
 import com.rota.facil.auth_service.domain.enums.ActionType;
 import com.rota.facil.auth_service.domain.enums.ResourceName;

@@ -1,6 +1,9 @@
 package com.rota.facil.auth_service.messaging.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -14,6 +17,15 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitConfig {
     @Value("${rabbitmq.auth.exchange}")
     private String authExchange;
+
+    @Value("${rabbitmq.transport.exchange}")
+    private String transportExchange;
+
+    @Value("${rabbitmq.user.feedback.routing.key}")
+    private String userFeedbackRoutingKey;
+
+    @Value("${rabbitmq.auth.user.updated.queue}")
+    private String userUpdateQueue;
 
     @Bean
     public Jackson2JsonMessageConverter messageConverter(ObjectMapper objectMapper) {
@@ -44,5 +56,20 @@ public class RabbitConfig {
     @Bean
     public TopicExchange authExchange() {
         return new TopicExchange(authExchange);
+    }
+
+    @Bean
+    public TopicExchange transportExchange() {
+        return new TopicExchange(transportExchange);
+    }
+
+    @Bean
+    public Queue userUpdateQueue() {
+        return new Queue(userUpdateQueue);
+    }
+
+    @Bean
+    public Binding userFeedbackBinding() {
+        return BindingBuilder.bind(this.userUpdateQueue()).to(this.transportExchange()).with(userFeedbackRoutingKey);
     }
 }

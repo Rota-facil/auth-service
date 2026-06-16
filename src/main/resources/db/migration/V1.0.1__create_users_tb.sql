@@ -6,6 +6,8 @@ CREATE TABLE IF NOT EXISTS users_tb (
     cpf VARCHAR(14),
     password VARCHAR(120),
     google_id TEXT,
+    completed_trips BIGINT NOT NULL,
+    score DOUBLE PRECISION NOT NULL DEFAULT 5,
     role VARCHAR(10) NOT NULL,
     active BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

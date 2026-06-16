@@ -129,6 +129,12 @@ public class UserService {
         return userMapper.map(updated);
     }
 
+    public void updateScore(UUID userId, double note) {
+        UserEntity userFound = this.fetchEntity(userId);
+        userFound.setScore(note);
+        userRepository.save(userFound);
+    }
+
     public UserResponseDTO fetch(CurrentUser currentUser) {
         return userMapper.map(this.fetchEntity(currentUser.userId()));
     }
