@@ -2,7 +2,7 @@ package com.rota.facil.auth_service.messaging.mappers;
 
 import com.rota.facil.auth_service.domain.enums.ActionType;
 import com.rota.facil.auth_service.http.dto.request.user.CurrentUser;
-import com.rota.facil.auth_service.messaging.dto.send.PrefectureEventSend;
+import com.rota.facil.auth_service.messaging.dto.send.prefecture.PrefectureEventSend;
 import com.rota.facil.auth_service.persistence.entities.PrefectureEntity;
 import org.mapstruct.Builder;
 import org.mapstruct.Mapper;

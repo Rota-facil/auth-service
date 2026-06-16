@@ -1,9 +1,7 @@
 package com.rota.facil.auth_service.messaging.producers;
 
-import com.rota.facil.auth_service.domain.enums.ActionType;
-import com.rota.facil.auth_service.domain.enums.ResourceName;
 import com.rota.facil.auth_service.domain.enums.UserActionType;
-import com.rota.facil.auth_service.messaging.dto.send.UserEventSend;
+import com.rota.facil.auth_service.messaging.dto.send.user.UserEventSend;
 import com.rota.facil.auth_service.messaging.mappers.UserEventMapper;
 import com.rota.facil.auth_service.persistence.entities.UserEntity;
 import lombok.RequiredArgsConstructor;

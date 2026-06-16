@@ -40,6 +40,13 @@ public class UserEntity implements UserDetails {
 
     private String password;
 
+    @Builder.Default
+    @Column(name = "completed_trips")
+    private Long completedTrips = 0L;
+
+    @Builder.Default
+    private Double score = 0.0;
+
     @Enumerated(EnumType.STRING)
     private Role role;
 
@@ -90,7 +97,7 @@ public class UserEntity implements UserDetails {
         if (infoToUpdate.getName() != null && !infoToUpdate.getName().equals(this.name)) this.name = infoToUpdate.getName();
         if (infoToUpdate.getEmail() != null && !infoToUpdate.getEmail().equals(this.email)) this.email = infoToUpdate.getEmail();
         if (infoToUpdate.getCpf() != null && !infoToUpdate.getCpf().equals(this.cpf)) this.cpf = infoToUpdate.getCpf();
-
+        if (infoToUpdate.getScore() != null && !infoToUpdate.getScore().equals(this.score)) this.score = infoToUpdate.getScore();
     }
 
     public boolean isDifferentEmail(String email) {
