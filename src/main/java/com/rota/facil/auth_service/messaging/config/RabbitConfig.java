@@ -24,8 +24,14 @@ public class RabbitConfig {
     @Value("${rabbitmq.user.feedback.routing.key}")
     private String userFeedbackRoutingKey;
 
+    @Value("${rabbitmq.user.trip.completed.routing.key}")
+    private String userCompletedTripRoutingKey;
+
     @Value("${rabbitmq.auth.user.updated.queue}")
     private String userUpdateQueue;
+
+    @Value("${rabbitmq.auth.user.complete.trip.queue}")
+    private String userCompleteTripQueue;
 
     @Bean
     public Jackson2JsonMessageConverter messageConverter(ObjectMapper objectMapper) {
@@ -69,7 +75,17 @@ public class RabbitConfig {
     }
 
     @Bean
+    public Queue userCompleteTripQueue() {
+        return new Queue(userCompleteTripQueue);
+    }
+
+    @Bean
     public Binding userFeedbackBinding() {
         return BindingBuilder.bind(this.userUpdateQueue()).to(this.transportExchange()).with(userFeedbackRoutingKey);
+    }
+
+    @Bean
+    public Binding userCompletedTripBinding() {
+        return BindingBuilder.bind(this.userCompleteTripQueue()).to(this.transportExchange()).with(userCompletedTripRoutingKey);
     }
 }

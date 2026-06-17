@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -166,6 +167,10 @@ public class UserService {
 
         userEventProducer.createUserEvent(user);
         return new AccessTokenResponseDTO(tokenService.generateAccessToken(saved));
+    }
+
+    public void increaseTripCompleted(List<UUID> userIds) {
+        userRepository.increaseTripCompletedByUserIds(userIds);
     }
 
     public void delete(CurrentUser currentUser) {
