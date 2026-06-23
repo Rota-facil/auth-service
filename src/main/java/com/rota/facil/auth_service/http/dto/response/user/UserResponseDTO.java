@@ -9,6 +9,7 @@ public record UserResponseDTO(
         String name,
         String email,
         String cpf,
+        UserPrefectureResponseDTO prefecture,
         Boolean active,
         Role role
 ) {
