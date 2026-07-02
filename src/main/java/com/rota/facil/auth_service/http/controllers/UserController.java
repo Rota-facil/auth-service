@@ -5,6 +5,7 @@ import com.rota.facil.auth_service.http.dto.request.user.*;
 import com.rota.facil.auth_service.http.dto.response.user.AccessTokenResponseDTO;
 import com.rota.facil.auth_service.http.dto.response.user.UserResponseDTO;
 import com.rota.facil.auth_service.http.google.handler.AuthSuccessHandler;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+@SecurityRequirement(name = "bearerAuth")
 @RestController
 @RequiredArgsConstructor
 public class UserController {

@@ -6,6 +6,7 @@ import com.rota.facil.auth_service.http.dto.request.prefecture.UpdatePrefectureR
 import com.rota.facil.auth_service.http.dto.request.user.CurrentUser;
 import com.rota.facil.auth_service.http.dto.response.prefecture.CreatePrefectureResponseDTO;
 import com.rota.facil.auth_service.http.dto.response.prefecture.PrefectureResponseDTO;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+@SecurityRequirement(name = "bearerAuth")
 @RestController
 @RequestMapping("/prefectures")
 @RequiredArgsConstructor
