@@ -50,7 +50,6 @@ public class UserController {
 
     @PostMapping("/user/login")
     public ResponseEntity<AccessTokenResponseDTO> login (@Valid @RequestBody LoginRequestDTO request) {
-        System.out.println("CHEGOU AQUI CHEGOU AQUI");
         return ResponseEntity.ok(userService.login(request));
     }
 
@@ -64,6 +63,7 @@ public class UserController {
 
     @GetMapping("/me")
     public ResponseEntity<UserResponseDTO> fetch(@AuthenticationPrincipal CurrentUser currentUser) {
+        System.out.println("CHEGOU AQUI CHEGOU AQUI");
         return ResponseEntity.ok(userService.fetch(currentUser));
     }
 
