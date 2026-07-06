@@ -41,6 +41,15 @@ public class UserController {
         return ResponseEntity.ok(userService.registerDriver(request, admin));
     }
 
+    @PutMapping("/driver/{driverId}/update")
+    public ResponseEntity<Void> updateDriver(
+            @AuthenticationPrincipal CurrentUser currentUser,
+            @PathVariable UUID driverId,
+            @RequestBody UpdateDriverRequestDTO request
+    ) {
+        userService.updateDriver(driverId, currentUser, request);
+    }
+
     @PostMapping("/user/prefecture/register")
     public ResponseEntity<AccessTokenResponseDTO> createPrefectureAccount(
             @Valid @RequestBody CreateUserAccountRequestDTO request,

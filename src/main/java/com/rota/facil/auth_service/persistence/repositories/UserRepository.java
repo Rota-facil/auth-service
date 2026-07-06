@@ -26,4 +26,13 @@ public interface UserRepository extends JpaRepository<UserEntity, UUID> {
         WHERE u.id IN (:userIds)
     """)
     void increaseTripCompletedByUserIds(@Param("userIds") List<UUID> userIds);
+
+    @Query("""
+        SELECT u FROM UserEntity u
+        INNER JOIN u.prefecture p
+        WHERE u.role = com.rota.facil.auth_service.domain.enums.Role.DRIVER
+        AND u.id = :driverId
+        AND p.id = :prefectureId
+    """)
+    Optional<UserEntity> findDriverByIdAndPrefectureId(@Param("driverId") UUID driverId, @Param("prefectureId") UUID prefectureId);
 }

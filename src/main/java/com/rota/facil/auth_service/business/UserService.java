@@ -204,6 +204,14 @@ public class UserService {
         userEventProducer.logout(userFound, currentUser.token());
     }
 
+    public void updateDriver(UUID driverId, CurrentUser currentUser, UpdateDriverRequestDTO request) {
+        UserEntity driverFound = userRepository.findDriverByIdAndPrefectureId(driverId, currentUser.prefectureId())
+                .orElseThrow(UserNotFoundException::new);
+
+        driverFound.update(userMapper.map(request));
+        userRepository.save(driverFound);
+    }
+
     private UserEntity fetchEntity(UUID userId) {
         return userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
     }
