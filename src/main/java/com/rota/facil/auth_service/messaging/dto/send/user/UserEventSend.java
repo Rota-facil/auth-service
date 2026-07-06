@@ -12,6 +12,7 @@ public record UserEventSend(
         String name,
         String email,
         Role role,
+        String cpf,
         String userToken,
         Boolean active,
 
