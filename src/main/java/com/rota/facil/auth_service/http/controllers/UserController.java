@@ -48,6 +48,7 @@ public class UserController {
             @RequestBody UpdateDriverRequestDTO request
     ) {
         userService.updateDriver(driverId, currentUser, request);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/user/prefecture/register")
