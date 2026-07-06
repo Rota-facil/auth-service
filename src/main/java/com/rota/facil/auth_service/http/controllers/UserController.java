@@ -21,6 +21,18 @@ public class UserController {
     private final UserService userService;
     private final AuthSuccessHandler authSuccessHandler;
 
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@AuthenticationPrincipal CurrentUser currentUser) {
+        userService.logout(currentUser);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/user/prefecture/{prefectureId}/change")
+    public ResponseEntity<Void> changePrefecture(@AuthenticationPrincipal CurrentUser currentUser, @PathVariable UUID prefectureId) {
+        userService.changePrefecture(currentUser, prefectureId);
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("/driver/register")
     public ResponseEntity<AccessTokenResponseDTO> createDriverAccount(
             @Valid @RequestBody CreateUserAccountRequestDTO request,

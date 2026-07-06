@@ -24,4 +24,9 @@ public interface UserEventMapper {
     @Mapping(target = "actionTitle", expression = "java(entity.getEmail() + actionType.getTitle())")
     @Mapping(target = "userToken", source ="token")
     UserEventSend map(UserEntity entity, String token, ActionType actionType, UUID resourceId);
+
+    @Mapping(target = "userId", source = "entity.id")
+    @Mapping(target = "prefectureId", source = "entity.prefecture.id")
+    @Mapping(target = "userToken", source ="token")
+    UserEventSend map(UserEntity entity, String token);
 }

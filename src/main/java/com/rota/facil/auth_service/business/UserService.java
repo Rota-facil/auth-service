@@ -17,6 +17,7 @@ import com.rota.facil.auth_service.persistence.repositories.PrefectureRepository
 import com.rota.facil.auth_service.persistence.repositories.TokenCompleteGoogleLoginRepository;
 import com.rota.facil.auth_service.persistence.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -186,6 +187,21 @@ public class UserService {
         userRepository.save(userFound);
 
         userEventProducer.deactivateUserEvent(userFound, currentUser.token());
+    }
+
+    public void changePrefecture(CurrentUser currentUser, UUID prefectureId) {
+        UserEntity userFound = this.fetchEntity(currentUser.userId());
+        PrefectureEntity prefectureFound = prefectureRepository.findById(prefectureId).orElseThrow(PrefectureNotFoundException::new);
+
+        userFound.setPrefecture(prefectureFound);
+
+        UserEntity saved = userRepository.save(userFound);
+        userEventProducer.updateUserEvent(saved);
+    }
+
+    public void logout(CurrentUser currentUser) {
+        UserEntity userFound = this.fetchEntity(currentUser.userId());
+        userEventProducer.logout(userFound, currentUser.token());
     }
 
     private UserEntity fetchEntity(UUID userId) {

@@ -1,6 +1,7 @@
 package com.rota.facil.auth_service.messaging.producers;
 
 import com.rota.facil.auth_service.domain.enums.UserActionType;
+import com.rota.facil.auth_service.http.dto.request.user.CurrentUser;
 import com.rota.facil.auth_service.messaging.dto.send.user.UserEventSend;
 import com.rota.facil.auth_service.messaging.mappers.UserEventMapper;
 import com.rota.facil.auth_service.persistence.entities.UserEntity;
@@ -32,6 +33,9 @@ public class RabbitAuthUserEventProducer {
     @Value("${rabbitmq.user.deactivate.routing.key}")
     private String userDeactivateRoutingKey;
 
+    @Value("${rabbitmq.user.logout.routing.key}")
+    private String userLogoutRoutingKey;
+
     private final UserEventMapper userEventMapper;
 
     public void createUserEvent(UserEntity userCreated) {
@@ -57,5 +61,10 @@ public class RabbitAuthUserEventProducer {
     public void deactivateUserEvent(UserEntity userDeactivated, String token) {
         UserEventSend userEventSend = userEventMapper.map(userDeactivated, token, UserActionType.DEACTIVATE, userDeactivated.getId());
         rabbitTemplate.convertAndSend(authExchange, userDeactivateRoutingKey, userEventSend);
+    }
+
+    public void logout(UserEntity userLogout, String token) {
+        UserEventSend userEventSend = userEventMapper.map(userLogout, token);
+        rabbitTemplate.convertAndSend(authExchange, userLogoutRoutingKey, userEventSend);
     }
 }
