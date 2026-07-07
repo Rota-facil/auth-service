@@ -41,6 +41,15 @@ public class UserController {
         return ResponseEntity.ok(userService.registerDriver(request, admin));
     }
 
+    @DeleteMapping("/driver/{driverId}/delete")
+    public ResponseEntity<Void> deleteDriver(
+            @AuthenticationPrincipal CurrentUser currentUser,
+            @PathVariable UUID driverId
+    ) {
+        userService.deactivate(currentUser, driverId);
+        return ResponseEntity.ok().build();
+    }
+
     @PutMapping("/driver/{driverId}/update")
     public ResponseEntity<Void> updateDriver(
             @AuthenticationPrincipal CurrentUser currentUser,
