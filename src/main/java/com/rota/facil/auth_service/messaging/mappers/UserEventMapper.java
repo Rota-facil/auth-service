@@ -49,17 +49,17 @@ public interface UserEventMapper {
     @Mapping(target = "actionTitle", expression = "java(admin.email() + actionType.getTitle() + driverUpdated.getEmail())")
     DriverUpdatedByAdminAuditEventSend map(UserEntity driverUpdated, CurrentUser admin, ActionType actionType);
 
-    @Mapping(target = "userId", source = "driverUpdated.id")
-    @Mapping(target = "prefectureId", source = "driverUpdated.prefecture.id")
-    @Mapping(target = "name", source = "driverUpdated.name")
-    @Mapping(target = "email", source = "driverUpdated.email")
-    @Mapping(target = "role", source = "driverUpdated.role")
-    @Mapping(target = "cpf", source = "driverUpdated.cpf")
+    @Mapping(target = "userId", source = "driverDeactivated.id")
+    @Mapping(target = "prefectureId", source = "driverDeactivated.prefecture.id")
+    @Mapping(target = "name", source = "driverDeactivated.name")
+    @Mapping(target = "email", source = "driverDeactivated.email")
+    @Mapping(target = "role", source = "driverDeactivated.role")
+    @Mapping(target = "cpf", source = "driverDeactivated.cpf")
     @Mapping(target = "actorUserId", source = "admin.userId")
     @Mapping(target = "actorEmail", source = "admin.email")
     @Mapping(target = "actorRole", source = "admin.role")
     @Mapping(target = "resourceName", expression = "java(ResourceName.USERS)")
-    @Mapping(target = "resourceId", source = "driverUpdated.id")
-    @Mapping(target = "actionTitle", expression = "java(admin.email() + actionType.getTitle() + driverUpdated.getEmail())")
-    DriverDeactivateByAdminEventSend mapDeactivate(UserEntity driverDeactivated, CurrentUser admin, UserActionType userActionType);
+    @Mapping(target = "resourceId", source = "driverDeactivated.id")
+    @Mapping(target = "actionTitle", expression = "java(admin.email() + actionType.getTitle() + driverDeactivated.getEmail())")
+    DriverDeactivateByAdminEventSend mapDeactivate(UserEntity driverDeactivated, CurrentUser admin, UserActionType actionType);
 }
