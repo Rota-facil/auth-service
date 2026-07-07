@@ -2,6 +2,7 @@ package com.rota.facil.auth_service.messaging.producers;
 
 import com.rota.facil.auth_service.domain.enums.UserActionType;
 import com.rota.facil.auth_service.http.dto.request.user.CurrentUser;
+import com.rota.facil.auth_service.messaging.dto.send.user.DriverDeactivateByAdminEventSend;
 import com.rota.facil.auth_service.messaging.dto.send.user.DriverUpdatedByAdminAuditEventSend;
 import com.rota.facil.auth_service.messaging.dto.send.user.UserEventSend;
 import com.rota.facil.auth_service.messaging.mappers.UserEventMapper;
@@ -69,6 +70,11 @@ public class RabbitAuthUserEventProducer {
 
     public void deactivateUserEvent(UserEntity userDeactivated, String token) {
         UserEventSend userEventSend = userEventMapper.map(userDeactivated, token, UserActionType.DEACTIVATE, userDeactivated.getId());
+        rabbitTemplate.convertAndSend(authExchange, userDeactivateRoutingKey, userEventSend);
+    }
+
+    public void adminDeactivateUserEvent(UserEntity driverDeactivated, CurrentUser admin) {
+        DriverDeactivateByAdminEventSend userEventSend = userEventMapper.mapDeactivate(driverDeactivated, admin, UserActionType.ADMIN_DEACTIVATE_DRIVER);
         rabbitTemplate.convertAndSend(authExchange, userDeactivateRoutingKey, userEventSend);
     }
 

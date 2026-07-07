@@ -190,11 +190,11 @@ public class UserService {
     }
 
     public void deactivate(CurrentUser currentUser, UUID driverId) {
-        UserEntity userFound = userRepository.findDriverByIdAndPrefectureId(driverId, currentUser.prefectureId()).orElseThrow(UserNotFoundException::new);
-        userFound.setActive(false);
-        userRepository.save(userFound);
+        UserEntity driverFound = userRepository.findDriverByIdAndPrefectureId(driverId, currentUser.prefectureId()).orElseThrow(UserNotFoundException::new);
+        driverFound.setActive(false);
+        userRepository.save(driverFound);
 
-        userEventProducer.deactivateUserEvent(userFound, currentUser.token());
+        userEventProducer.adminDeactivateUserEvent(driverFound, currentUser);
     }
 
     public void changePrefecture(CurrentUser currentUser, UUID prefectureId) {
