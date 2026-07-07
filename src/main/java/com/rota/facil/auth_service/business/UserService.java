@@ -209,7 +209,9 @@ public class UserService {
                 .orElseThrow(UserNotFoundException::new);
 
         driverFound.update(userMapper.map(request));
-        userRepository.save(driverFound);
+        UserEntity updated = userRepository.save(driverFound);
+
+        userEventProducer.updateDriverByAdminAuditEvent(updated, currentUser);
     }
 
     private UserEntity fetchEntity(UUID userId) {

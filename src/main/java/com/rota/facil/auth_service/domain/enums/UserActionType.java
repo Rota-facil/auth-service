@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 public enum UserActionType implements ActionType{
     CREATE(" criou uma conta"),
     UPDATE(" atualizou seus dados"),
+    ADMIN_UPDATE_DRIVER(" atualizou dados do motorista "),
     DELETE( "deletou sua conta"),
     DEACTIVATE( "desativou sua conta");
 

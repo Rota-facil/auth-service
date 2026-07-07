@@ -2,6 +2,7 @@ package com.rota.facil.auth_service.messaging.producers;
 
 import com.rota.facil.auth_service.domain.enums.UserActionType;
 import com.rota.facil.auth_service.http.dto.request.user.CurrentUser;
+import com.rota.facil.auth_service.messaging.dto.send.user.DriverUpdatedByAdminAuditEventSend;
 import com.rota.facil.auth_service.messaging.dto.send.user.UserEventSend;
 import com.rota.facil.auth_service.messaging.mappers.UserEventMapper;
 import com.rota.facil.auth_service.persistence.entities.UserEntity;
@@ -36,6 +37,9 @@ public class RabbitAuthUserEventProducer {
     @Value("${rabbitmq.user.logout.routing.key}")
     private String userLogoutRoutingKey;
 
+    @Value("${rabbitmq.driver.admin.updated.routing.key}")
+    private String driverAdminUpdatedRoutingKey;
+
     private final UserEventMapper userEventMapper;
 
     public void createUserEvent(UserEntity userCreated) {
@@ -46,6 +50,11 @@ public class RabbitAuthUserEventProducer {
     public void updateUserEvent(UserEntity userUpdated) {
         UserEventSend userEventSend = userEventMapper.map(userUpdated, UserActionType.UPDATE, userUpdated.getId());
         rabbitTemplate.convertAndSend(authExchange, userUpdatedRoutingKey, userEventSend);
+    }
+
+    public void updateDriverByAdminAuditEvent(UserEntity driverUpdated, CurrentUser admin) {
+        DriverUpdatedByAdminAuditEventSend eventSend = userEventMapper.map(driverUpdated, admin, UserActionType.ADMIN_UPDATE_DRIVER);
+        rabbitTemplate.convertAndSend(authExchange, driverAdminUpdatedRoutingKey, eventSend);
     }
 
     public void emailChangedUserEvent(UserEntity userEmailChanged, String token) {
