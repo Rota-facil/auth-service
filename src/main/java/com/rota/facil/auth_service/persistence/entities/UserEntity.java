@@ -48,7 +48,7 @@ public class UserEntity implements UserDetails {
     private Long trips = 0L;
 
     @Builder.Default
-    private Double score = 0.0;
+    private Double score = 5.0;
 
     @Enumerated(EnumType.STRING)
     private Role role;
