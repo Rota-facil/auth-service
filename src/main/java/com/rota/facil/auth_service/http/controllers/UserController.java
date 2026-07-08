@@ -8,6 +8,10 @@ import com.rota.facil.auth_service.http.google.handler.AuthSuccessHandler;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -96,8 +100,15 @@ public class UserController {
 
     @GetMapping("/me")
     public ResponseEntity<UserResponseDTO> fetch(@AuthenticationPrincipal CurrentUser currentUser) {
-        System.out.println("CHEGOU AQUI CHEGOU AQUI");
         return ResponseEntity.ok(userService.fetch(currentUser));
+    }
+
+    @GetMapping("/students")
+    public ResponseEntity<Page<UserResponseDTO>> listStudents(
+            @ParameterObject @PageableDefault Pageable pageable,
+            @AuthenticationPrincipal CurrentUser currentUser
+    ) {
+        return ResponseEntity.ok(userService.listStudents(currentUser, pageable));
     }
 
     @PatchMapping("/deactivate")

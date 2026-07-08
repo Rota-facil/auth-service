@@ -27,11 +27,23 @@ public class RabbitConfig {
     @Value("${rabbitmq.user.trip.completed.routing.key}")
     private String userCompletedTripRoutingKey;
 
+    @Value("${rabbitmq.user.trips.increased.routing.key}")
+    private String userTripsIncreasedRoutingKey;
+
+    @Value("${rabbitmq.user.trips.decreased.routing.key}")
+    private String userTripsDecreasedRoutingKey;
+
     @Value("${rabbitmq.auth.user.updated.queue}")
     private String userUpdateQueue;
 
     @Value("${rabbitmq.auth.user.complete.trip.queue}")
     private String userCompleteTripQueue;
+
+    @Value("${rabbitmq.auth.user.trips.increased.queue}")
+    private String userTripsIncreasedQueue;
+
+    @Value("${rabbitmq.auth.user.trips.decreased.queue}")
+    private String userTripsDecreasedQueue;
 
     @Bean
     public Jackson2JsonMessageConverter messageConverter(ObjectMapper objectMapper) {
@@ -80,6 +92,16 @@ public class RabbitConfig {
     }
 
     @Bean
+    public Queue userTripsIncreasedQueue() {
+        return new Queue(userTripsIncreasedQueue);
+    }
+
+    @Bean
+    public Queue userTripsDecreasedQueue() {
+        return new Queue(userTripsDecreasedQueue);
+    }
+
+    @Bean
     public Binding userFeedbackBinding() {
         return BindingBuilder.bind(this.userUpdateQueue()).to(this.transportExchange()).with(userFeedbackRoutingKey);
     }
@@ -87,5 +109,15 @@ public class RabbitConfig {
     @Bean
     public Binding userCompletedTripBinding() {
         return BindingBuilder.bind(this.userCompleteTripQueue()).to(this.transportExchange()).with(userCompletedTripRoutingKey);
+    }
+
+    @Bean
+    public Binding userTripsIncreasedBinding() {
+        return BindingBuilder.bind(this.userTripsIncreasedQueue()).to(this.transportExchange()).with(userTripsIncreasedRoutingKey);
+    }
+
+    @Bean
+    public Binding userTripsDecreasedBinding() {
+        return BindingBuilder.bind(this.userTripsDecreasedQueue()).to(this.transportExchange()).with(userTripsDecreasedRoutingKey);
     }
 }

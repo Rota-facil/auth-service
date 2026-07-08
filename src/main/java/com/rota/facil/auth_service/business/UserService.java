@@ -17,7 +17,8 @@ import com.rota.facil.auth_service.persistence.repositories.PrefectureRepository
 import com.rota.facil.auth_service.persistence.repositories.TokenCompleteGoogleLoginRepository;
 import com.rota.facil.auth_service.persistence.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -141,6 +142,11 @@ public class UserService {
         return userMapper.map(this.fetchEntity(currentUser.userId()));
     }
 
+    public Page<UserResponseDTO> listStudents(CurrentUser currentUser, Pageable pageable) {
+        return userRepository.findAllStudentsByPrefectureId(currentUser.prefectureId(), pageable)
+                .map(userMapper::map);
+    }
+
     public AccessTokenResponseDTO completeGoogleRegistration(CompleteGoogleRegistrationRequestDTO request, UUID pendingToken) {
         TokenCompleteGoogleLoginEntity googleLoginEntity = tokenCompleteGoogleLoginRepository.findByToken(pendingToken)
                 .orElseThrow(CompleteGoogleLoginException::new);
@@ -170,8 +176,19 @@ public class UserService {
         return new AccessTokenResponseDTO(tokenService.generateAccessToken(saved));
     }
 
+    @Transactional
     public void increaseTripCompleted(List<UUID> userIds) {
         userRepository.increaseTripCompletedByUserIds(userIds);
+    }
+
+    @Transactional
+    public void increaseTrips(List<UUID> userIds) {
+        userRepository.increaseTripsByUserIds(userIds);
+    }
+
+    @Transactional
+    public void decreaseTrips(List<UUID> userIds) {
+        userRepository.decreaseTripsByUserIds(userIds);
     }
 
     public void delete(CurrentUser currentUser) {

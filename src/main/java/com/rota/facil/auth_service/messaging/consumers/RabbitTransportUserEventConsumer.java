@@ -3,6 +3,7 @@ package com.rota.facil.auth_service.messaging.consumers;
 import com.rota.facil.auth_service.business.UserService;
 import com.rota.facil.auth_service.messaging.dto.receive.user.UserCompleteTripEventReceive;
 import com.rota.facil.auth_service.messaging.dto.receive.user.UserUpdateScoreEventReceive;
+import com.rota.facil.auth_service.messaging.dto.receive.user.UserUpdateTripsEventReceive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
@@ -20,5 +21,15 @@ public class RabbitTransportUserEventConsumer {
     @RabbitListener(queues = "${rabbitmq.auth.user.complete.trip.queue}")
     public void handlerUserCompleteTrip(UserCompleteTripEventReceive event) {
         userService.increaseTripCompleted(event.userIds());
+    }
+
+    @RabbitListener(queues = "${rabbitmq.auth.user.trips.increased.queue}")
+    public void handlerUserTripsIncreased(UserUpdateTripsEventReceive event) {
+        userService.increaseTrips(event.userIds());
+    }
+
+    @RabbitListener(queues = "${rabbitmq.auth.user.trips.decreased.queue}")
+    public void handlerUserTripsDecreased(UserUpdateTripsEventReceive event) {
+        userService.decreaseTrips(event.userIds());
     }
 }

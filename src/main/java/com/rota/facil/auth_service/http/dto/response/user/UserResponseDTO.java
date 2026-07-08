@@ -13,6 +13,7 @@ public record UserResponseDTO(
         UserPrefectureResponseDTO prefecture,
         Boolean active,
         Long completedTrips,
+        Long trips,
         Double score,
         Role role,
         LocalDateTime createdAt
