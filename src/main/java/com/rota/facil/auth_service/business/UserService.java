@@ -2,10 +2,7 @@ package com.rota.facil.auth_service.business;
 
 import com.rota.facil.auth_service.domain.enums.Role;
 import com.rota.facil.auth_service.domain.enums.UserAuditAction;
-import com.rota.facil.auth_service.domain.exceptions.CompleteGoogleLoginException;
-import com.rota.facil.auth_service.domain.exceptions.PendingTokenExpiredException;
-import com.rota.facil.auth_service.domain.exceptions.PrefectureNotFoundException;
-import com.rota.facil.auth_service.domain.exceptions.UserNotFoundException;
+import com.rota.facil.auth_service.domain.exceptions.*;
 import com.rota.facil.auth_service.http.dto.request.user.*;
 import com.rota.facil.auth_service.http.dto.response.user.AccessTokenResponseDTO;
 import com.rota.facil.auth_service.http.dto.response.user.UserResponseDTO;
@@ -52,6 +49,10 @@ public class UserService {
         preSaved.setPrefecture(prefectureFound);
         preSaved.setPassword(passwordEncoder.encode(preSaved.getPassword()));
         preSaved.setRole(Role.STUDENT);
+
+
+        if (userRepository.findByCpf(preSaved.getCpf()).isPresent()) throw new AlreadyExistsUserCpf();
+        if (userRepository.findByEmailWithoutActiveProperty(preSaved.getEmail()).isPresent()) throw new AlreadyExistsUserEmail();
 
         UserEntity saved = userRepository.save(preSaved);
 

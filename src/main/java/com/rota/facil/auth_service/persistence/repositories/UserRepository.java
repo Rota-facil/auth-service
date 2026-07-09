@@ -24,6 +24,12 @@ public interface UserRepository extends JpaRepository<UserEntity, UUID> {
 
     @Query("""
         SELECT u FROM UserEntity u
+        WHERE u.email = :email
+    """)
+    Optional<UserEntity> findByEmailWithoutActiveProperty(@Param("email") String email);
+
+    @Query("""
+        SELECT u FROM UserEntity u
         INNER JOIN u.prefecture p
         WHERE u.role = com.rota.facil.auth_service.domain.enums.Role.STUDENT
         AND p.id = :prefectureId
@@ -67,4 +73,10 @@ public interface UserRepository extends JpaRepository<UserEntity, UUID> {
         AND u.active IS TRUE
     """)
     Optional<UserEntity> findDriverByIdAndPrefectureId(@Param("driverId") UUID driverId, @Param("prefectureId") UUID prefectureId);
+
+    @Query("""
+        SELECT u FROM UserEntity u
+        WHERE u.cpf = :cpf
+    """)
+    Optional<UserEntity> findByCpf(@Param("cpf") String cpf);
 }

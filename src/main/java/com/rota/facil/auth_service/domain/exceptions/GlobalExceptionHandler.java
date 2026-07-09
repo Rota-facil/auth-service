@@ -38,6 +38,16 @@ public class GlobalExceptionHandler {
         return this.resolveExceptions(HttpStatus.BAD_REQUEST, request, ex);
     }
 
+    @ExceptionHandler
+    public ResponseEntity<Object> alreadyExistsUserEmail(AlreadyExistsUserEmail ex, HttpServletRequest request) {
+        return this.resolveExceptions(HttpStatus.BAD_REQUEST, request, ex);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<Object> alreadyExistsUserCpf(AlreadyExistsUserCpf ex, HttpServletRequest request) {
+        return this.resolveExceptions(HttpStatus.BAD_REQUEST, request, ex);
+    }
+
     private ResponseEntity<Object> resolveExceptions(HttpStatus status, HttpServletRequest request, Exception ex) {
         Map<String, Object> body = new HashMap<>();
         body.put("timestamp", LocalDateTime.now());
