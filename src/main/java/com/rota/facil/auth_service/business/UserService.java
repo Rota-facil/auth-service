@@ -1,6 +1,7 @@
 package com.rota.facil.auth_service.business;
 
 import com.rota.facil.auth_service.domain.enums.Role;
+import com.rota.facil.auth_service.domain.enums.UserAuditAction;
 import com.rota.facil.auth_service.domain.exceptions.CompleteGoogleLoginException;
 import com.rota.facil.auth_service.domain.exceptions.PendingTokenExpiredException;
 import com.rota.facil.auth_service.domain.exceptions.PrefectureNotFoundException;
@@ -56,7 +57,7 @@ public class UserService {
 
         String token = tokenService.generateAccessToken(saved);
 
-        userEventProducer.createUserEvent(saved);
+        userEventProducer.createUserEvent(saved, UserAuditAction.STUDENT_CREATED_ACCOUNT);
         return new AccessTokenResponseDTO(token);
     }
 
@@ -74,7 +75,7 @@ public class UserService {
 
         String token = tokenService.generateAccessToken(saved);
 
-        userEventProducer.createUserEvent(saved);
+        userEventProducer.createDriverByAdminEvent(saved, admin);
         return new AccessTokenResponseDTO(token);
     }
 
@@ -127,7 +128,7 @@ public class UserService {
 
         if (isDifferentEmail) userEventProducer.emailChangedUserEvent(updated, currentUser.token());
 
-        userEventProducer.updateUserEvent(updated);
+        userEventProducer.updateUserEvent(updated, UserAuditAction.USER_UPDATED_OWN_ACCOUNT);
 
         return userMapper.map(updated);
     }
@@ -172,7 +173,7 @@ public class UserService {
 
         tokenCompleteGoogleLoginRepository.deleteByToken(pendingToken);
 
-        userEventProducer.createUserEvent(user);
+        userEventProducer.createUserEvent(user, UserAuditAction.STUDENT_CREATED_ACCOUNT);
         return new AccessTokenResponseDTO(tokenService.generateAccessToken(saved));
     }
 
@@ -221,7 +222,7 @@ public class UserService {
         userFound.setPrefecture(prefectureFound);
 
         UserEntity saved = userRepository.save(userFound);
-        userEventProducer.updateUserEvent(saved);
+        userEventProducer.updateUserEvent(saved, UserAuditAction.USER_UPDATED_OWN_ACCOUNT);
     }
 
     public void logout(CurrentUser currentUser) {
@@ -236,7 +237,7 @@ public class UserService {
         driverFound.update(userMapper.map(request));
         UserEntity updated = userRepository.save(driverFound);
 
-        userEventProducer.updateDriverByAdminAuditEvent(updated, currentUser);
+        userEventProducer.updateDriverByAdminEvent(updated, currentUser);
     }
 
     private UserEntity fetchEntity(UUID userId) {

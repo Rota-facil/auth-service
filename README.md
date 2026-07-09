@@ -63,6 +63,7 @@ Exchange: `auth.events`
 - `user.deleted`
 - `user.email.changed`
 - `user.deactivate`
+- `user.logout`
 - `prefecture.created`
 - `prefecture.updated`
 - `prefecture.deleted`

@@ -1,9 +1,11 @@
 package com.rota.facil.auth_service.messaging.producers;
 
-import com.rota.facil.auth_service.domain.enums.PrefectureActionType;
+import com.rota.facil.auth_service.domain.enums.PrefectureAuditAction;
+import com.rota.facil.auth_service.domain.enums.ResourceName;
 import com.rota.facil.auth_service.http.dto.request.user.CurrentUser;
-import com.rota.facil.auth_service.messaging.dto.send.prefecture.PrefectureEventSend;
-import com.rota.facil.auth_service.messaging.mappers.PrefectureEventMapper;
+import com.rota.facil.auth_service.messaging.dto.send.prefecture.PrefectureCreatedEventSend;
+import com.rota.facil.auth_service.messaging.dto.send.prefecture.PrefectureDeletedEventSend;
+import com.rota.facil.auth_service.messaging.dto.send.prefecture.PrefectureUpdatedEventSend;
 import com.rota.facil.auth_service.persistence.entities.PrefectureEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -14,7 +16,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class RabbitAuthPrefectureEventProducer {
     private final RabbitTemplate rabbitTemplate;
-    private final PrefectureEventMapper prefectureEventMapper;
 
     @Value("${rabbitmq.auth.exchange}")
     private String authExchange;
@@ -29,18 +30,53 @@ public class RabbitAuthPrefectureEventProducer {
     private String prefectureDeletedRoutingKey;
 
     public void createPrefectureEvent(PrefectureEntity prefectureCreated, CurrentUser currentUser) {
-        PrefectureEventSend prefectureEventSend = prefectureEventMapper.map(prefectureCreated, currentUser, PrefectureActionType.CREATE);
-        rabbitTemplate.convertAndSend(authExchange, prefectureCreatedRoutingKey, prefectureEventSend);
+        PrefectureAuditAction auditAction = PrefectureAuditAction.PREFECTURE_CREATED;
+        PrefectureCreatedEventSend eventSend = new PrefectureCreatedEventSend(
+                currentUser.userId(),
+                currentUser.email(),
+                currentUser.role(),
+                auditAction.title(currentUser.email(), prefectureCreated.getName()),
+                auditAction.getActionType(),
+                ResourceName.PREFECTURE.name(),
+                prefectureCreated.getId(),
+                prefectureCreated.getId(),
+                prefectureCreated.getName()
+        );
+
+        rabbitTemplate.convertAndSend(authExchange, prefectureCreatedRoutingKey, eventSend);
     }
 
     public void updatePrefectureEvent(PrefectureEntity prefectureUpdated, CurrentUser currentUser) {
-        PrefectureEventSend prefectureEventSend = prefectureEventMapper.map(prefectureUpdated, currentUser, PrefectureActionType.UPDATE);
-        rabbitTemplate.convertAndSend(authExchange, prefectureUpdatedRoutingKey, prefectureEventSend);
+        PrefectureAuditAction auditAction = PrefectureAuditAction.PREFECTURE_UPDATED;
+        PrefectureUpdatedEventSend eventSend = new PrefectureUpdatedEventSend(
+                currentUser.userId(),
+                currentUser.email(),
+                currentUser.role(),
+                auditAction.title(currentUser.email(), prefectureUpdated.getName()),
+                auditAction.getActionType(),
+                ResourceName.PREFECTURE.name(),
+                prefectureUpdated.getId(),
+                prefectureUpdated.getId(),
+                prefectureUpdated.getName()
+        );
+
+        rabbitTemplate.convertAndSend(authExchange, prefectureUpdatedRoutingKey, eventSend);
     }
 
     public void deletePrefectureEvent(PrefectureEntity prefectureDeleted, CurrentUser currentUser) {
-        PrefectureEventSend prefectureEventSend = prefectureEventMapper.map(prefectureDeleted, currentUser, PrefectureActionType.DELETE);
-        rabbitTemplate.convertAndSend(authExchange, prefectureDeletedRoutingKey, prefectureEventSend);
-    }
+        PrefectureAuditAction auditAction = PrefectureAuditAction.PREFECTURE_DELETED;
+        PrefectureDeletedEventSend eventSend = new PrefectureDeletedEventSend(
+                currentUser.userId(),
+                currentUser.email(),
+                currentUser.role(),
+                auditAction.title(currentUser.email(), prefectureDeleted.getName()),
+                auditAction.getActionType(),
+                ResourceName.PREFECTURE.name(),
+                prefectureDeleted.getId(),
+                prefectureDeleted.getId(),
+                prefectureDeleted.getName()
+        );
 
+        rabbitTemplate.convertAndSend(authExchange, prefectureDeletedRoutingKey, eventSend);
+    }
 }
