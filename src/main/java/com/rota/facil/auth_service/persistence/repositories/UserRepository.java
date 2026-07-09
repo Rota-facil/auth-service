@@ -27,7 +27,7 @@ public interface UserRepository extends JpaRepository<UserEntity, UUID> {
         INNER JOIN u.prefecture p
         WHERE u.role = com.rota.facil.auth_service.domain.enums.Role.STUDENT
         AND p.id = :prefectureId
-        ORDER BY u.active, u.name ASC
+        ORDER BY u.active DESC, u.name ASC
     """)
     Page<UserEntity> findAllStudentsByPrefectureId(@Param("prefectureId") UUID prefectureId, Pageable pageable);
 
