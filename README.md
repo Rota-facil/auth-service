@@ -1,113 +1,77 @@
 # auth-service
 
-Servico de autenticacao e administracao de usuarios/prefeituras do Rota Facil. Ele emite JWT, cadastra contas, autentica usuarios e publica eventos para os demais microservicos manterem suas copias locais sincronizadas.
-
-## Para que serve
-
-- Registro de estudantes, motoristas, administradores e usuarios de prefeitura.
-- Login local por email/senha.
-- Fluxo OAuth2 com Google e conclusao de cadastro.
-- Gestao de prefeituras.
-- Emissao de JWT assinado com chave privada.
-- Publicacao de eventos de usuarios e prefeituras no RabbitMQ.
+Serviço de identidade do Rota Fácil. Cadastra e autentica usuários, administra prefeituras, emite JWT e publica eventos para sincronização dos demais serviços.
 
 ## Porta e base path
 
-- Aplicacao: `auth-service`
 - Porta: `8084`
 - Context path: `/auth`
 - Via gateway: `http://localhost:8080/auth`
 
-## Endpoints principais
-
-Usuarios:
-
-- `POST /auth/register`: cria conta publica, com perfil `STUDENT`.
-- `POST /auth/driver/register`: cria conta de motorista. Exige `ADMIN` no gateway.
-- `POST /auth/user/prefecture/register`: cria conta vinculada a prefeitura. Exige `SUPERUSER`.
-- `POST /auth/google/complete-registration?pendingToken={uuid}`: conclui cadastro iniciado por Google.
-- `GET /auth/user/login`: realiza login com body `email` e `password`.
-- `GET /auth/me`: retorna usuario autenticado.
-- `PUT /auth/update`: atualiza usuario autenticado.
-- `PATCH /auth/deactivate`: desativa conta autenticada.
-- `DELETE /auth`: remove conta autenticada.
-
-Prefeituras:
-
-- `POST /auth/prefectures`: cria prefeitura e usuario admin inicial.
-- `GET /auth/prefectures`: lista prefeituras.
-- `GET /auth/prefectures/{prefectureId}`: busca prefeitura.
-- `PUT /auth/prefectures/{prefectureId}`: atualiza prefeitura.
-- `DELETE /auth/prefectures/{prefectureId}`: remove prefeitura.
-
-Infra:
-
-- `GET /auth/health-check`
-- `/auth/v3/api-docs`
-- `/auth/swagger-ui.html`
-
 ## Perfis
 
-- `STUDENT`
-- `DRIVER`
-- `ADMIN`
-- `SUPERUSER`
+`STUDENT`, `DRIVER`, `ADMIN` e `SUPERUSER`.
 
-## Eventos publicados
+## Endpoints de usuário
 
-Exchange: `auth.events`
+- `POST /auth/register`: cadastro público de estudante.
+- `POST /auth/user/login`: login com e-mail e senha.
+- `POST /auth/logout`: invalida o token atual por evento.
+- `POST /auth/google/complete-registration?pendingToken={uuid}`: conclui cadastro Google.
+- `GET /auth/me`: retorna o usuário autenticado.
+- `PUT /auth/update`: atualiza a própria conta.
+- `PATCH /auth/deactivate`: desativa a própria conta.
+- `DELETE /auth`: remove a própria conta.
+- `PATCH /auth/user/prefecture/{prefectureId}/change`: estudante troca de prefeitura.
+- `GET /auth/students?page=0&size=20`: lista estudantes da prefeitura para `ADMIN/SUPERUSER`.
+- `POST /auth/driver/register`: admin cadastra motorista.
+- `PUT /auth/driver/{driverId}/update`: admin atualiza motorista.
+- `DELETE /auth/driver/{driverId}/delete`: admin desativa motorista.
+- `POST /auth/user/prefecture/register`: cria usuário administrativo; a primeira regra aplicável no gateway exige `SUPERUSER`.
 
-- `user.created`
-- `user.updated`
-- `driver.admin.updated`
-- `user.deleted`
-- `user.email.changed`
-- `user.deactivate`
-- `user.logout`
-- `prefecture.created`
-- `prefecture.updated`
-- `prefecture.deleted`
+## Endpoints de prefeitura
 
-Consumidores importantes:
+- `POST /auth/prefectures`
+- `GET /auth/prefectures`
+- `GET /auth/prefectures/{prefectureId}`
+- `PUT /auth/prefectures/{prefectureId}`
+- `DELETE /auth/prefectures/{prefectureId}`
 
-- `transport-service`: replica usuarios para rotas/viagens.
-- `file-service`: remove arquivos de usuarios/prefeituras apagados.
-- `audit-service`: registra auditoria.
-- `notification-service`: envia email de conta criada/removida.
-- `gateway-service`: invalida tokens quando usuario e removido ou troca email.
+Os GETs são públicos no gateway; mutações exigem `SUPERUSER`.
 
-## Banco de dados
+Infra: `GET /auth/health-check`, `/auth/v3/api-docs` e `/auth/swagger-ui.html`.
 
-- Default: `jdbc:postgresql://localhost:5434/auth_database`
-- Usuario default: `rota-facil`
-- Senha default: `admin`
+## JWT e segurança
+
+O serviço assina tokens com `SECURITY_PRIVATE_KEY`. O gateway valida com a chave pública e injeta a identidade nos serviços internos. Senhas e chaves devem vir de variáveis de ambiente.
+
+## Eventos
+
+Publica em `auth.events`:
+
+- `user.created`, `user.updated`, `driver.admin.updated`, `user.deleted`, `user.email.changed`, `user.deactivate`, `user.logout`.
+- `prefecture.created`, `prefecture.updated`, `prefecture.deleted`.
+
+O cadastro por admin preenche os campos `actor*` para preservar o ator na auditoria. O fluxo atual de `registerUserPrefecture` não publica `user.created`.
+
+Consome de `transport.events`:
+
+- `user.feedback`: atualiza score.
+- `trip.completed`: incrementa viagens concluídas.
+- `user.trips.increased` e `user.trips.decreased`: ajustam o total de viagens associado ao usuário.
+
+## Persistência
+
+- Banco: `jdbc:postgresql://localhost:5434/auth_database`
+- Usuário padrão: `rota-facil`
 - Migrations: `src/main/resources/db/migration`
-
-## Variaveis relevantes
-
-- `AUTH_DATASOURCE_URL`
-- `DATASOURCE_USERNAME`, `DATASOURCE_PASSWORD`
-- `EUREKA_URL`
-- `RABBITMQ_HOST`, `RABBITMQ_PORT`, `RABBITMQ_USER`, `RABBITMQ_PASSWORD`
-- `SECURITY_PRIVATE_KEY`
-- `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`
+- Hibernate: `ddl-auto=validate`
 
 ## Como rodar
-
-Pre-requisitos:
-
-- Java 21.
-- PostgreSQL com banco `auth_database`.
-- Eureka.
-- RabbitMQ.
-
-Comando:
 
 ```bash
 cd auth-service
 ./mvnw spring-boot:run
 ```
 
-## Especializacao
-
-Este servico e a fonte principal de identidade, perfis, prefeituras e tokens. Outros servicos nao devem criar usuarios diretamente; devem consumir eventos do `auth-service` quando precisarem de uma copia local.
+Requer Java 21, PostgreSQL, Eureka e RabbitMQ. Para OAuth, configure `GOOGLE_CLIENT_ID` e `GOOGLE_CLIENT_SECRET`; para JWT, configure `SECURITY_PRIVATE_KEY`.
