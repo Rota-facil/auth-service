@@ -10,6 +10,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthSuccessHandler implements AuthenticationSuccessHandler {
@@ -64,11 +66,18 @@ public class AuthSuccessHandler implements AuthenticationSuccessHandler {
         response.setContentType("application/json");
 
         if (user.getPrefecture() != null && user.getCpf() != null) {
+            log.info("\n\nUSUARIO DE LOGIN TEM PREFEITURA E CPF\n\n");
+            log.info("\n\nO APP BASE URL EH {}\n\n", APP_BASE_URL);
             String accessToken = tokenService.generateAccessToken(user);
             response.sendRedirect(APP_BASE_URL + "/oauth2/callback?token=" + accessToken);
             return;
         }
 
+
+        log.info("\n\nUSUARIO DE LOGIN NAO TEM PREFEITURA E CPF\n\n");
+
+
+        log.info("\n\nO APP BASE URL EH {}\n\n", APP_BASE_URL);
 
         UUID pendingToken = UUID.randomUUID();
         tokenCompleteGoogleLoginRepository.findByUserId(user.getId())
