@@ -1,6 +1,6 @@
 package com.rota.facil.auth_service.http.controllers;
 
-import com.rota.facil.auth_service.business.PrefectureService;
+import com.rota.facil.auth_service.business.prefecture.*;
 import com.rota.facil.auth_service.http.dto.request.prefecture.CreatePrefectureRequestDTO;
 import com.rota.facil.auth_service.http.dto.request.prefecture.UpdatePrefectureRequestDTO;
 import com.rota.facil.auth_service.http.dto.request.user.CurrentUser;
@@ -21,24 +21,28 @@ import java.util.UUID;
 @RequestMapping("/prefectures")
 @RequiredArgsConstructor
 public class PrefectureController {
-    private final PrefectureService prefectureService;
+    private final CreatePrefectureUseCase createPrefectureUseCase;
+    private final FetchPrefectureUseCase fetchPrefectureUseCase;
+    private final ListPrefectureUseCase listPrefectureUseCase;
+    private final UpdatePrefectureUseCase updatePrefectureUseCase;
+    private final DeletePrefectureUseCase deletePrefectureUseCase;
 
     @PostMapping
     public ResponseEntity<CreatePrefectureResponseDTO> createPrefecture(
             @Valid @RequestBody CreatePrefectureRequestDTO request,
             @AuthenticationPrincipal CurrentUser currentUser
             ) {
-        return ResponseEntity.ok(prefectureService.register(request, currentUser));
+        return ResponseEntity.ok(createPrefectureUseCase.execute(request, currentUser));
     }
 
     @GetMapping("/{prefectureId}")
     public ResponseEntity<PrefectureResponseDTO> fetchPrefecture(@PathVariable UUID prefectureId) {
-        return ResponseEntity.ok(prefectureService.fetch(prefectureId));
+        return ResponseEntity.ok(fetchPrefectureUseCase.execute(prefectureId));
     }
 
     @GetMapping
     public ResponseEntity<List<PrefectureResponseDTO>> listPrefectures() {
-        return ResponseEntity.ok(prefectureService.list());
+        return ResponseEntity.ok(listPrefectureUseCase.execute());
     }
 
     @PutMapping("/{prefectureId}")
@@ -47,12 +51,12 @@ public class PrefectureController {
             @RequestBody UpdatePrefectureRequestDTO request,
             @AuthenticationPrincipal CurrentUser currentUser
     ) {
-        return ResponseEntity.ok(prefectureService.update(prefectureId, request, currentUser));
+        return ResponseEntity.ok(updatePrefectureUseCase.execute(prefectureId, request, currentUser));
     }
 
     @DeleteMapping("/{prefectureId}")
     public ResponseEntity<Void> deletePrefecture(@PathVariable UUID prefectureId, @AuthenticationPrincipal CurrentUser currentUser) {
-        prefectureService.delete(prefectureId, currentUser);
+        deletePrefectureUseCase.execute(prefectureId, currentUser);
         return ResponseEntity.ok().build();
     }
 }
