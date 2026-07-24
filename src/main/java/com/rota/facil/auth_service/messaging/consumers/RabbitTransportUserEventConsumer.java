@@ -1,6 +1,9 @@
 package com.rota.facil.auth_service.messaging.consumers;
 
-import com.rota.facil.auth_service.business.UserService;
+import com.rota.facil.auth_service.business.user.DecreaseUserTripsUseCase;
+import com.rota.facil.auth_service.business.user.IncreaseUserCompletedTripsUseCase;
+import com.rota.facil.auth_service.business.user.IncreaseUserTripsUseCase;
+import com.rota.facil.auth_service.business.user.UpdateUserScoreUseCase;
 import com.rota.facil.auth_service.messaging.dto.receive.user.UserCompleteTripEventReceive;
 import com.rota.facil.auth_service.messaging.dto.receive.user.UserUpdateScoreEventReceive;
 import com.rota.facil.auth_service.messaging.dto.receive.user.UserUpdateTripsEventReceive;
@@ -11,25 +14,28 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class RabbitTransportUserEventConsumer {
-    private final UserService userService;
+    private final UpdateUserScoreUseCase updateUserScoreUseCase;
+    private final IncreaseUserTripsUseCase increaseUserTripsUseCase;
+    private final IncreaseUserCompletedTripsUseCase increaseUserCompletedTripsUseCase;
+    private final DecreaseUserTripsUseCase decreaseUserTripsUseCase;
 
     @RabbitListener(queues = "${rabbitmq.auth.user.updated.queue}")
     public void handlerUpdateScore(UserUpdateScoreEventReceive event) {
-        userService.updateScore(event.userId(), event.note());
+        updateUserScoreUseCase.execute(event.userId(), event.note());
     }
 
     @RabbitListener(queues = "${rabbitmq.auth.user.complete.trip.queue}")
     public void handlerUserCompleteTrip(UserCompleteTripEventReceive event) {
-        userService.increaseTripCompleted(event.userIds());
+        increaseUserCompletedTripsUseCase.execute(event.userIds());
     }
 
     @RabbitListener(queues = "${rabbitmq.auth.user.trips.increased.queue}")
     public void handlerUserTripsIncreased(UserUpdateTripsEventReceive event) {
-        userService.increaseTrips(event.userIds());
+        increaseUserTripsUseCase.execute(event.userIds());
     }
 
     @RabbitListener(queues = "${rabbitmq.auth.user.trips.decreased.queue}")
     public void handlerUserTripsDecreased(UserUpdateTripsEventReceive event) {
-        userService.decreaseTrips(event.userIds());
+        decreaseUserTripsUseCase.execute(event.userIds());
     }
 }
