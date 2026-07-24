@@ -1,10 +1,9 @@
 package com.rota.facil.auth_service.http.controllers;
 
-import com.rota.facil.auth_service.business.UserService;
+import com.rota.facil.auth_service.business.user.*;
 import com.rota.facil.auth_service.http.dto.request.user.*;
 import com.rota.facil.auth_service.http.dto.response.user.AccessTokenResponseDTO;
 import com.rota.facil.auth_service.http.dto.response.user.UserResponseDTO;
-import com.rota.facil.auth_service.http.google.handler.AuthSuccessHandler;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,18 +21,29 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 public class UserController {
-    private final UserService userService;
-    private final AuthSuccessHandler authSuccessHandler;
+    private final CreateUserUseCase createUserUseCase;
+    private final CreateDriverUseCase createDriverUseCase;
+    private final CreateUserOfPrefectureUseCase createUserOfPrefectureUseCase;
+    private final LoginUseCase loginUseCase;
+    private final UpdateUserUseCase updateUserUseCase;
+    private final FetchUserUseCase fetchUserUseCase;
+    private final ListStudentsUseCase listStudentsUseCase;
+    private final CompleteGoogleRegistrationUseCase completeGoogleRegistrationUseCase;
+    private final LogoutUseCase logoutUseCase;
+    private final ChangePrefectureUserCase changePrefectureUserCase;
+    private final DeactivateUserUseCase deactivateUserUseCase;
+    private final DeactivateDriverUseCase deactivateDriverUseCase;
+    private final UpdateDriverUseCase updateDriverUseCase;
 
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(@AuthenticationPrincipal CurrentUser currentUser) {
-        userService.logout(currentUser);
+        logoutUseCase.execute(currentUser);
         return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/user/prefecture/{prefectureId}/change")
     public ResponseEntity<Void> changePrefecture(@AuthenticationPrincipal CurrentUser currentUser, @PathVariable UUID prefectureId) {
-        userService.changePrefecture(currentUser, prefectureId);
+        changePrefectureUserCase.execute(currentUser, prefectureId);
         return ResponseEntity.ok().build();
     }
 
@@ -42,7 +52,7 @@ public class UserController {
             @Valid @RequestBody CreateUserAccountRequestDTO request,
             @AuthenticationPrincipal CurrentUser admin
     ) {
-        return ResponseEntity.ok(userService.registerDriver(request, admin));
+        return ResponseEntity.ok(createDriverUseCase.execute(request, admin));
     }
 
     @DeleteMapping("/driver/{driverId}/delete")
@@ -50,7 +60,7 @@ public class UserController {
             @AuthenticationPrincipal CurrentUser currentUser,
             @PathVariable UUID driverId
     ) {
-        userService.deactivate(currentUser, driverId);
+        deactivateDriverUseCase.execute(currentUser, driverId);
         return ResponseEntity.ok().build();
     }
 
@@ -60,7 +70,7 @@ public class UserController {
             @PathVariable UUID driverId,
             @RequestBody UpdateDriverRequestDTO request
     ) {
-        userService.updateDriver(driverId, currentUser, request);
+        updateDriverUseCase.execute(driverId, currentUser, request);
         return ResponseEntity.ok().build();
     }
 
@@ -69,7 +79,7 @@ public class UserController {
             @Valid @RequestBody CreateUserAccountRequestDTO request,
             @AuthenticationPrincipal CurrentUser admin
             ) {
-        return ResponseEntity.ok(userService.registerUserPrefecture(request, admin));
+        return ResponseEntity.ok(createUserOfPrefectureUseCase.execute(request, admin));
     }
 
     @PostMapping("/google/complete-registration")
@@ -77,17 +87,17 @@ public class UserController {
             @RequestBody CompleteGoogleRegistrationRequestDTO request,
             @RequestParam String pendingToken
     ) {
-        return ResponseEntity.ok(userService.completeGoogleRegistration(request, UUID.fromString(pendingToken)));
+        return ResponseEntity.ok(completeGoogleRegistrationUseCase.execute(request, UUID.fromString(pendingToken)));
     }
 
     @PostMapping("/register")
     public ResponseEntity<AccessTokenResponseDTO> createAccount(@Valid  @RequestBody CreateAccountRequestDTO request) {
-        return ResponseEntity.ok(userService.register(request));
+        return ResponseEntity.ok(createUserUseCase.execute(request));
     }
 
     @PostMapping("/user/login")
     public ResponseEntity<AccessTokenResponseDTO> login (@Valid @RequestBody LoginRequestDTO request) {
-        return ResponseEntity.ok(userService.login(request));
+        return ResponseEntity.ok(loginUseCase.execute(request));
     }
 
     @PutMapping("/update")
@@ -95,12 +105,12 @@ public class UserController {
             @AuthenticationPrincipal CurrentUser currentUser,
             @Valid @RequestBody UpdateAccountRequestDTO request
     ) {
-        return ResponseEntity.ok(userService.update(request, currentUser));
+        return ResponseEntity.ok(updateUserUseCase.execute(request, currentUser));
     }
 
     @GetMapping("/me")
     public ResponseEntity<UserResponseDTO> fetch(@AuthenticationPrincipal CurrentUser currentUser) {
-        return ResponseEntity.ok(userService.fetch(currentUser));
+        return ResponseEntity.ok(fetchUserUseCase.execute(currentUser));
     }
 
     @GetMapping("/students")
@@ -108,18 +118,13 @@ public class UserController {
             @ParameterObject @PageableDefault Pageable pageable,
             @AuthenticationPrincipal CurrentUser currentUser
     ) {
-        return ResponseEntity.ok(userService.listStudents(currentUser, pageable));
+        return ResponseEntity.ok(listStudentsUseCase.execute(currentUser, pageable));
     }
 
     @PatchMapping("/deactivate")
     public ResponseEntity<Void> deactivateAccount(@AuthenticationPrincipal CurrentUser currentUser) {
-        userService.deactivate(currentUser);
+        deactivateUserUseCase.execute(currentUser);
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping
-    public ResponseEntity<Void> deleteAccount(@AuthenticationPrincipal CurrentUser currentUser) {
-        userService.delete(currentUser);
-        return ResponseEntity.ok().build();
-    }
 }
